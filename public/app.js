@@ -213,4 +213,6 @@ async function handlePayment(serviceId, button) {
     } catch (err) {
         showError(err.message || 'Payment failed');
     }
+    // After successful wallet connection
+    document.getElementById('networkBadge').classList.remove('hidden'); 
 }
