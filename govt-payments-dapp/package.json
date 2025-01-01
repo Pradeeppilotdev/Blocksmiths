@@ -1,0 +1,22 @@
+{
+  "name": "govt-payments-dapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@metamask/detect-provider": "^2.0.0",
+    "@openzeppelin/contracts": "^5.1.0",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.17",
+    "web3": "^4.16.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0"
+  }
+}
