@@ -41,18 +41,18 @@ function showError(message) {
 }
 
 function showSuccess(txHash) {
-    Swal.fire({
-        icon: 'success',
-        title: 'Payment Successful!',
-        html: `
-            <div class="mt-4">
-                <p class="mb-2">Your payment has been processed successfully.</p>
-                <p class="text-sm text-gray-500">Transaction Hash:</p>
-                <p class="font-mono text-xs break-all bg-gray-100 p-2 rounded">${txHash}</p>
-            </div>
-        `,
-        confirmButtonColor: '#3B82F6',
-    });
+    const txHashElement = document.getElementById('txHash');
+    const txLinkElement = document.getElementById('txLink');
+    const successAlert = document.getElementById('successAlert');
+    
+    // Update hash display
+    txHashElement.textContent = txHash;
+    
+    // Update Etherscan link
+    txLinkElement.href = `https://sepolia.etherscan.io/tx/${txHash}`;
+    
+    // Show the alert
+    successAlert.classList.remove('hidden');
 }
 
 async function connectWallet() {
@@ -215,4 +215,19 @@ async function handlePayment(serviceId, button) {
     }
     // After successful wallet connection
     document.getElementById('networkBadge').classList.remove('hidden'); 
+}
+
+function copyTxHash() {
+    const txHash = document.getElementById('txHash').textContent;
+    navigator.clipboard.writeText(txHash).then(() => {
+        // Show temporary success message
+        Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Hash copied to clipboard!',
+            showConfirmButton: false,
+            timer: 1500,
+            toast: true
+        });
+    });
 }

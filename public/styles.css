@@ -1,0 +1,31 @@
+/* Utility Classes */
+.connected {
+    background-color: #1a1a1a;
+    color: #60a5fa;
+}
+
+/* Card Animations */
+.service-card:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Text Effects */
+.gradient-text {
+    background: linear-gradient(45deg, #60a5fa, #3b82f6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Add to your existing styles */
+.copy-success {
+    animation: fadeOut 2s forwards;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+} 
