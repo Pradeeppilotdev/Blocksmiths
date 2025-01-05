@@ -1,19 +1,19 @@
 // Service definitions
 const services = {
     electricity: { 
-        amount: 0.01, 
+        amount: 0.001, 
         title: 'Electricity Board'
     },
     water: { 
-        amount: 0.015, 
+        amount: 0.0015, 
         title: 'Water Connection'
     },
     building: { 
-        amount: 0.02, 
+        amount: 0.002, 
         title: 'Building Permits'
     },
     document: { 
-        amount: 0.005, 
+        amount: 0.0005, 
         title: 'Document Verification'
     }
 };
@@ -41,18 +41,18 @@ function showError(message) {
 }
 
 function showSuccess(txHash) {
-    const txHashElement = document.getElementById('txHash');
-    const txLinkElement = document.getElementById('txLink');
     const successAlert = document.getElementById('successAlert');
+    const txHashElement = document.getElementById('txHash');
+    const txLink = document.getElementById('txLink');
     
-    // Update hash display
     txHashElement.textContent = txHash;
-    
-    // Update Etherscan link
-    txLinkElement.href = `https://sepolia.etherscan.io/tx/${txHash}`;
-    
-    // Show the alert
+    txLink.href = `https://sepolia.etherscan.io/tx/${txHash}`;
     successAlert.classList.remove('hidden');
+
+    // Optionally hide after some time
+    setTimeout(() => {
+        successAlert.classList.add('hidden');
+    }, 10000); // Hide after 10 seconds
 }
 
 async function connectWallet() {
@@ -75,12 +75,22 @@ async function connectWallet() {
         walletAddress = null;
     }
     loading = false;
+
+    // Show network badge
+    const networkBadge = document.getElementById('networkBadge');
+    networkBadge.classList.remove('hidden');
+    
+    // Set a timeout to hide the badge after 7 seconds
+    setTimeout(() => {
+        networkBadge.classList.add('hidden');
+    }, 7000);
 }
 
 function disconnectWallet() {
     walletAddress = null;
     updateWalletButton();
 }
+
 
 function updateWalletButton() {
     if (walletAddress) {
@@ -220,14 +230,20 @@ async function handlePayment(serviceId, button) {
 function copyTxHash() {
     const txHash = document.getElementById('txHash').textContent;
     navigator.clipboard.writeText(txHash).then(() => {
-        // Show temporary success message
+        // Show a small tooltip or notification that it was copied
         Swal.fire({
+            toast: true,
             position: 'top-end',
             icon: 'success',
             title: 'Hash copied to clipboard!',
             showConfirmButton: false,
-            timer: 1500,
-            toast: true
+            timer: 1500
         });
     });
+}
+
+function handlePaymentSuccess() {
+    // Hide network badge after successful payment
+    const networkBadge = document.getElementById('networkBadge');
+    networkBadge.classList.add('hidden');
 }
