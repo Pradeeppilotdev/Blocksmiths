@@ -21,6 +21,7 @@ const services = {
 // State management
 let walletAddress = null;
 let loading = false;
+let selectedFiles = {};
 
 // DOM Elements
 const connectWalletBtn = document.getElementById('connectWallet');
@@ -206,6 +207,14 @@ async function handlePayment(serviceId, button) {
             return;
         }
 
+        const file = selectedFiles[serviceId];
+        if (!file) {
+            throw new Error('Please upload a certificate first');
+        }
+
+        // Upload file to IPFS or your preferred storage
+        const fileHash = await uploadFileToIPFS(file);
+
         // Create the transaction parameters
         const transactionParameters = {
             to: PAYMENT_ADDRESS,
@@ -225,6 +234,12 @@ async function handlePayment(serviceId, button) {
     }
     // After successful wallet connection
     document.getElementById('networkBadge').classList.remove('hidden'); 
+}
+
+async function uploadFileToIPFS(file) {
+    // Implement your file upload logic here
+    // You might want to use services like Web3.Storage, Pinata, or your own IPFS node
+    // Return the IPFS hash/CID of the uploaded file
 }
 
 function copyTxHash() {
