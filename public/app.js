@@ -190,6 +190,60 @@ const contractABI = [
     }
 ];
 
+const SEPOLIA_CHAIN_ID = '0xaa36a7'; // Chain ID for Sepolia
+
+async function checkAndSwitchNetwork() {
+    if (!window.ethereum) {
+        showError('Please install MetaMask to use this feature');
+        return false;
+    }
+
+    try {
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        if (chainId !== SEPOLIA_CHAIN_ID) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: SEPOLIA_CHAIN_ID }],
+                });
+                return true;
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: SEPOLIA_CHAIN_ID,
+                                chainName: 'Sepolia Test Network',
+                                nativeCurrency: {
+                                    name: 'Sepolia ETH',
+                                    symbol: 'SEP',
+                                    decimals: 18
+                                },
+                                rpcUrls: ['https://sepolia.infura.io/v3/'],
+                                blockExplorerUrls: ['https://sepolia.etherscan.io']
+                            }]
+                        });
+                        return true;
+                    } catch (addError) {
+                        console.error('Error adding Sepolia network:', addError);
+                        showError('Failed to add Sepolia network');
+                        return false;
+                    }
+                }
+                console.error('Error switching to Sepolia:', switchError);
+                showError('Failed to switch to Sepolia network');
+                return false;
+            }
+        }
+        return true;
+    } catch (error) {
+        console.error('Error checking network:', error);
+        showError('Failed to check network');
+        return false;
+    }
+}
+
 // Wait for ethers to load
 function waitForEthers() {
     return new Promise((resolve) => {
