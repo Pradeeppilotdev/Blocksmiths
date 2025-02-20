@@ -59,7 +59,7 @@
 
             <!-- Success Alert -->
             <div id="successAlert" class="fixed inset-0 flex items-center justify-center z-50 px-6 hidden">
-                <div class="bg-gray-900/80 backdrop-blur-md border border-green-500 rounded-lg p-6 max-w-xl w-full" style="background-color: rgba(0, 0, 0, 0.5);>
+                <div class="bg-gray-900/80 backdrop-blur-md border border-green-500 rounded-lg p-6 max-w-xl w-full">
                     <div class="text-center">
                         <div class="mb-4">
                             <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,6 +81,18 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                     </svg>
                                 </a>
+                            </div>
+                            <!-- Add IPFS Link Section -->
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-400 mb-2">View Uploaded File:</p>
+                                <div class="flex items-center justify-center space-x-2">
+                                    <a id="ipfsLink" href="#" target="_blank" class="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors">
+                                        <span>View on IPFS</span>
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                        </svg>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -173,16 +185,19 @@
                     <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <input type="file" 
-                               id="certificateFile-electricity"
-                               class="block w-full text-sm text-gray-400
-                                      file:mr-4 file:py-2 file:px-4
-                                      file:rounded-lg file:border-0
-                                      file:font-semibold
-                                      file:bg-gray-700 file:text-white
-                                      hover:file:bg-gray-600"
-                               accept=".pdf,.jpg,.jpeg,.png"
-                               onchange="handleFileSelect(event, 'electricity')" />
+                        <div class="relative">
+                            <input type="file" 
+                                   id="certificateFile-electricity"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   accept=".pdf,.jpg,.jpeg,.png"
+                                   onchange="handleFileSelect(event, 'electricity')" />
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                <span id="fileName-electricity" class="text-sm">Choose file</span>
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m-8-8h16"/>
+                                </svg>
+                            </div>
+                        </div>
                         <div id="fileInfo-electricity" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
@@ -192,10 +207,13 @@
                         <button onclick="handlePayment('electricity')"
                                 class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
                                 id="payButton-electricity">
-                            <span>Pay Now</span>
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
+                            <span class="payment-text">Pay Now</span>
+                            <div class="payment-loading hidden">
+                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -215,16 +233,19 @@
                     <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <input type="file" 
-                               id="certificateFile-water"
-                               class="block w-full text-sm text-gray-400
-                                      file:mr-4 file:py-2 file:px-4
-                                      file:rounded-lg file:border-0
-                                      file:font-semibold
-                                      file:bg-gray-700 file:text-white
-                                      hover:file:bg-gray-600"
-                               accept=".pdf,.jpg,.jpeg,.png"
-                               onchange="handleFileSelect(event, 'water')" />
+                        <div class="relative">
+                            <input type="file" 
+                                   id="certificateFile-water"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   accept=".pdf,.jpg,.jpeg,.png"
+                                   onchange="handleFileSelect(event, 'water')" />
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                <span id="fileName-water" class="text-sm">Choose file</span>
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m-8-8h16"/>
+                                </svg>
+                            </div>
+                        </div>
                         <div id="fileInfo-water" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
@@ -234,10 +255,13 @@
                         <button onclick="handlePayment('water')"
                                 class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
                                 id="payButton-water">
-                            <span>Pay Now</span>
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
+                            <span class="payment-text">Pay Now</span>
+                            <div class="payment-loading hidden">
+                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -258,16 +282,19 @@
                     <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <input type="file" 
-                               id="certificateFile-building"
-                               class="block w-full text-sm text-gray-400
-                                      file:mr-4 file:py-2 file:px-4
-                                      file:rounded-lg file:border-0
-                                      file:font-semibold
-                                      file:bg-gray-700 file:text-white
-                                      hover:file:bg-gray-600"
-                               accept=".pdf,.jpg,.jpeg,.png"
-                               onchange="handleFileSelect(event, 'building')" />
+                        <div class="relative">
+                            <input type="file" 
+                                   id="certificateFile-building"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   accept=".pdf,.jpg,.jpeg,.png"
+                                   onchange="handleFileSelect(event, 'building')" />
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                <span id="fileName-building" class="text-sm">Choose file</span>
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m-8-8h16"/>
+                                </svg>
+                            </div>
+                        </div>
                         <div id="fileInfo-building" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
@@ -277,10 +304,13 @@
                         <button onclick="handlePayment('building')"
                                 class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
                                 id="payButton-building">
-                            <span>Pay Now</span>
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
+                            <span class="payment-text">Pay Now</span>
+                            <div class="payment-loading hidden">
+                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -304,16 +334,19 @@
                     <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <input type="file" 
-                               id="certificateFile-document"
-                               class="block w-full text-sm text-gray-400
-                                      file:mr-4 file:py-2 file:px-4
-                                      file:rounded-lg file:border-0
-                                      file:font-semibold
-                                      file:bg-gray-700 file:text-white
-                                      hover:file:bg-gray-600"
-                               accept=".pdf,.jpg,.jpeg,.png"
-                               onchange="handleFileSelect(event, 'document')" />
+                        <div class="relative">
+                            <input type="file" 
+                                   id="certificateFile-document"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   accept=".pdf,.jpg,.jpeg,.png"
+                                   onchange="handleFileSelect(event, 'document')" />
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                <span id="fileName-document" class="text-sm">Choose file</span>
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m-8-8h16"/>
+                                </svg>
+                            </div>
+                        </div>
                         <div id="fileInfo-document" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
@@ -323,10 +356,13 @@
                         <button onclick="handlePayment('document')"
                                 class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
                                 id="payButton-document">
-                            <span>Pay Now</span>
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
+                            <span class="payment-text">Pay Now</span>
+                            <div class="payment-loading hidden">
+                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
                         </button>
                     </div>
                 </div>
