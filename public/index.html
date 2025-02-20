@@ -11,6 +11,9 @@
     <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
+    <!-- Use ethers v6 -->
+    <script src="https://cdn.ethers.io/lib/ethers-6.7.0.umd.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
     <!-- Navbar -->
@@ -27,7 +30,7 @@
                     <h1 class="text-2xl font-bold">GovChain Pay</h1>
                 </div>
                 
-                <button id="connectWallet" class="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors">
+                <button id="connectWallet" onclick="connectWallet()" class="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
                         <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
@@ -166,31 +169,29 @@
                         <h3 class="text-lg font-semibold">Electricity Board</h3>
                     </div>
                     <p class="text-gray-400 mb-4">Pay electricity bills and new connection fees</p>
-                    <!-- Add file upload section -->
+                    
+                    <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <div class="flex items-center space-x-2">
-                            <label class="flex-1 cursor-pointer bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition-colors">
-                                <input type="file" 
-                                       class="hidden file-input" 
-                                       data-service="electricity"
-                                       accept=".pdf,.jpg,.jpeg,.png"
-                                       onchange="handleFileSelect(this)">
-                                <div class="flex items-center justify-center space-x-2 text-gray-300">
-                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 5v14M5 12l7-7 7 7"/>
-                                    </svg>
-                                    <span class="file-name">Choose file</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="mt-2 text-sm text-gray-500 hidden file-info"></div>
+                        <input type="file" 
+                               id="certificateFile-electricity"
+                               class="block w-full text-sm text-gray-400
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-lg file:border-0
+                                      file:font-semibold
+                                      file:bg-gray-700 file:text-white
+                                      hover:file:bg-gray-600"
+                               accept=".pdf,.jpg,.jpeg,.png"
+                               onchange="handleFileSelect(event, 'electricity')" />
+                        <div id="fileInfo-electricity" class="mt-2 text-sm text-gray-500"></div>
                     </div>
+
+                    <!-- Payment Button -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.001 ETH</span>
-                        <button class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors" 
-                                data-service="electricity" 
-                                disabled>
+                        <button onclick="handlePayment('electricity')"
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
+                                id="payButton-electricity">
                             <span>Pay Now</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
@@ -210,31 +211,29 @@
                         <h3 class="text-lg font-semibold">Water Connection</h3>
                     </div>
                     <p class="text-gray-400 mb-4">Process water connection requests and pay bills</p>
-                    <!-- Add file upload section -->
+                    
+                    <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <div class="flex items-center space-x-2">
-                            <label class="flex-1 cursor-pointer bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition-colors">
-                                <input type="file" 
-                                       class="hidden file-input" 
-                                       data-service="water"
-                                       accept=".pdf,.jpg,.jpeg,.png"
-                                       onchange="handleFileSelect(this)">
-                                <div class="flex items-center justify-center space-x-2 text-gray-300">
-                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 5v14M5 12l7-7 7 7"/>
-                                    </svg>
-                                    <span class="file-name">Choose file</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="mt-2 text-sm text-gray-500 hidden file-info"></div>
+                        <input type="file" 
+                               id="certificateFile-water"
+                               class="block w-full text-sm text-gray-400
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-lg file:border-0
+                                      file:font-semibold
+                                      file:bg-gray-700 file:text-white
+                                      hover:file:bg-gray-600"
+                               accept=".pdf,.jpg,.jpeg,.png"
+                               onchange="handleFileSelect(event, 'water')" />
+                        <div id="fileInfo-water" class="mt-2 text-sm text-gray-500"></div>
                     </div>
+
+                    <!-- Payment Button -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.0015 ETH</span>
-                        <button class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors" 
-                                data-service="water" 
-                                disabled>
+                        <button onclick="handlePayment('water')"
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
+                                id="payButton-water">
                             <span>Pay Now</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
@@ -255,31 +254,29 @@
                         <h3 class="text-lg font-semibold">Building Permits</h3>
                     </div>
                     <p class="text-gray-400 mb-4">Apply and pay for construction permits</p>
-                    <!-- Add file upload section -->
+                    
+                    <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <div class="flex items-center space-x-2">
-                            <label class="flex-1 cursor-pointer bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition-colors">
-                                <input type="file" 
-                                       class="hidden file-input" 
-                                       data-service="building"
-                                       accept=".pdf,.jpg,.jpeg,.png"
-                                       onchange="handleFileSelect(this)">
-                                <div class="flex items-center justify-center space-x-2 text-gray-300">
-                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 5v14M5 12l7-7 7 7"/>
-                                    </svg>
-                                    <span class="file-name">Choose file</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="mt-2 text-sm text-gray-500 hidden file-info"></div>
+                        <input type="file" 
+                               id="certificateFile-building"
+                               class="block w-full text-sm text-gray-400
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-lg file:border-0
+                                      file:font-semibold
+                                      file:bg-gray-700 file:text-white
+                                      hover:file:bg-gray-600"
+                               accept=".pdf,.jpg,.jpeg,.png"
+                               onchange="handleFileSelect(event, 'building')" />
+                        <div id="fileInfo-building" class="mt-2 text-sm text-gray-500"></div>
                     </div>
+
+                    <!-- Payment Button -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.002 ETH</span>
-                        <button class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors" 
-                                data-service="building" 
-                                disabled>
+                        <button onclick="handlePayment('building')"
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
+                                id="payButton-building">
                             <span>Pay Now</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
@@ -303,31 +300,29 @@
                         <h3 class="text-lg font-semibold">Document Verification</h3>
                     </div>
                     <p class="text-gray-400 mb-4">Get official documents verified</p>
-                    <!-- Add file upload section -->
+                    
+                    <!-- File Upload Section -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <div class="flex items-center space-x-2">
-                            <label class="flex-1 cursor-pointer bg-gray-700 hover:bg-gray-600 rounded-lg px-4 py-2 transition-colors">
-                                <input type="file" 
-                                       class="hidden file-input" 
-                                       data-service="document"
-                                       accept=".pdf,.jpg,.jpeg,.png"
-                                       onchange="handleFileSelect(this)">
-                                <div class="flex items-center justify-center space-x-2 text-gray-300">
-                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 5v14M5 12l7-7 7 7"/>
-                                    </svg>
-                                    <span class="file-name">Choose file</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="mt-2 text-sm text-gray-500 hidden file-info"></div>
+                        <input type="file" 
+                               id="certificateFile-document"
+                               class="block w-full text-sm text-gray-400
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-lg file:border-0
+                                      file:font-semibold
+                                      file:bg-gray-700 file:text-white
+                                      hover:file:bg-gray-600"
+                               accept=".pdf,.jpg,.jpeg,.png"
+                               onchange="handleFileSelect(event, 'document')" />
+                        <div id="fileInfo-document" class="mt-2 text-sm text-gray-500"></div>
                     </div>
+
+                    <!-- Payment Button -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.0005 ETH</span>
-                        <button class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors" 
-                                data-service="document" 
-                                disabled>
+                        <button onclick="handlePayment('document')"
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
+                                id="payButton-document">
                             <span>Pay Now</span>
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
@@ -392,17 +387,18 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="app.js"></script>
     <script>
         // Add these to your existing JavaScript variables
         let selectedFiles = {};
         
-        function handleFileSelect(input) {
-            const service = input.dataset.service;
-            const file = input.files[0];
-            const fileInfo = input.closest('.service-card').querySelector('.file-info');
-            const fileName = input.closest('.service-card').querySelector('.file-name');
-            const payButton = input.closest('.service-card').querySelector('.service-pay');
+        function handleFileSelect(event, service) {
+            const file = event.target.files[0];
+            const fileInfo = event.target.closest('.service-card').querySelector('#fileInfo-' + service);
+            const fileName = event.target.closest('.service-card').querySelector('.file-name-' + service);
+            const payButton = event.target.closest('.service-card').querySelector('#payButton-' + service);
             
             if (file) {
                 // Update the file name display

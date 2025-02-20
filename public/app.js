@@ -1,264 +1,410 @@
-// Service definitions
-const services = {
-    electricity: { 
-        amount: 0.001, 
-        title: 'Electricity Board'
+// Global state
+let userWalletAddress = null;
+let provider = null;
+let signer = null;
+let contract = null;
+const selectedFiles = {};
+
+// Contract configuration
+const contractAddress = '0xf8e81D47203A594245E36C48e151709F0C19fBe8';
+const contractABI = [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
-    water: { 
-        amount: 0.0015, 
-        title: 'Water Connection'
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "payer",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "service",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "certificateIPFSHash",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "PaymentMade",
+      "type": "event"
     },
-    building: { 
-        amount: 0.002, 
-        title: 'Building Permits'
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "service",
+          "type": "string"
+        }
+      ],
+      "name": "getServiceFee",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
-    document: { 
-        amount: 0.0005, 
-        title: 'Document Verification'
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "service",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "certificateIPFSHash",
+          "type": "string"
+        }
+      ],
+      "name": "makePayment",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "serviceFees",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "service",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "newFee",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateServiceFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "userPayments",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "payer",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "service",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "certificateIPFSHash",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdrawFunds",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
-};
+];
 
-// State management
-let walletAddress = null;
-let loading = false;
-let selectedFiles = {};
-
-// DOM Elements
-const connectWalletBtn = document.getElementById('connectWallet');
-const serviceButtons = document.querySelectorAll('.service-pay');
-const errorAlert = document.getElementById('errorAlert');
-const errorText = document.getElementById('errorText');
-
-// Add at the top with other constants
-const SEPOLIA_CHAIN_ID = '0xaa36a7'; // Chain ID for Sepolia testnet
-const PAYMENT_ADDRESS = '0x4c961ff79a2d2607afE8cd6B25E55f78a89B69B7';
-
-function showError(message) {
-    errorText.textContent = message;
-    errorAlert.classList.remove('hidden');
-    setTimeout(() => {
-        errorAlert.classList.add('hidden');
-    }, 5000);
-}
-
-function showSuccess(txHash) {
-    const successAlert = document.getElementById('successAlert');
-    const txHashElement = document.getElementById('txHash');
-    const txLink = document.getElementById('txLink');
-    
-    txHashElement.textContent = txHash;
-    txLink.href = `https://sepolia.etherscan.io/tx/${txHash}`;
-    successAlert.classList.remove('hidden');
-
-    // Optionally hide after some time
-    setTimeout(() => {
-        successAlert.classList.add('hidden');
-    }, 10000); // Hide after 10 seconds
-}
-
-async function connectWallet() {
-    if (typeof window.ethereum === 'undefined') {
-        showError('Please install MetaMask to use this service');
-        return;
-    }
-
-    loading = true;
-    try {
-        // Request account access
-        const accounts = await window.ethereum.request({ 
-            method: 'eth_requestAccounts' 
-        });
+// Wait for ethers to load
+function waitForEthers() {
+    return new Promise((resolve) => {
+        if (typeof ethers !== 'undefined') {
+            return resolve();
+        }
         
-        walletAddress = accounts[0];
-        updateWalletButton();
-    } catch (err) {
-        showError(err.message || 'Failed to connect wallet');
-        walletAddress = null;
-    }
-    loading = false;
-
-    // Show network badge
-    const networkBadge = document.getElementById('networkBadge');
-    networkBadge.classList.remove('hidden');
-    
-    // Set a timeout to hide the badge after 7 seconds
-    setTimeout(() => {
-        networkBadge.classList.add('hidden');
-    }, 7000);
-}
-
-function disconnectWallet() {
-    walletAddress = null;
-    updateWalletButton();
-}
-
-
-function updateWalletButton() {
-    if (walletAddress) {
-        connectWalletBtn.innerHTML = `
-            <div class="flex items-center space-x-3">
-                <div class="flex items-center space-x-2">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-                        <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-                        <path d="M18 12h.01" />
-                    </svg>
-                    <span>${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}</span>
-                </div>
-                <button onclick="disconnectWallet()" class="ml-2 bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg text-white text-sm transition-colors">
-                    Disconnect
-                </button>
-            </div>
-        `;
-        connectWalletBtn.classList.add('connected');
-        connectWalletBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-        connectWalletBtn.classList.add('bg-gray-800', 'hover:bg-gray-700');
-    } else {
-        connectWalletBtn.innerHTML = `
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-                <path d="M18 12h.01" />
-            </svg>
-            <span>Connect Wallet</span>
-        `;
-        connectWalletBtn.classList.remove('connected', 'bg-gray-800', 'hover:bg-gray-700');
-        connectWalletBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
-    }
-}
-
-// Event Listeners
-connectWalletBtn.addEventListener('click', (e) => {
-    // Prevent the click if it's on the disconnect button
-    if (e.target.closest('button[onclick="disconnectWallet()"]')) {
-        return;
-    }
-    if (!walletAddress) {
-        connectWallet();
-    }
-});
-
-serviceButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-        const serviceId = button.dataset.service;
-        handlePayment(serviceId, button);
-    });
-});
-
-// MetaMask Events
-if (window.ethereum) {
-    window.ethereum.on('accountsChanged', (accounts) => {
-        walletAddress = accounts.length ? accounts[0] : null;
-        updateWalletButton();
-    });
-
-    window.ethereum.on('chainChanged', () => {
-        window.location.reload();
-    });
-}
-
-async function handlePayment(serviceId, button) {
-    if (!walletAddress) {
-        showError('Please connect your wallet first');
-        return;
-    }
-
-    // Check and switch to Sepolia network if needed
-    try {
-        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-        if (chainId !== SEPOLIA_CHAIN_ID) {
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: SEPOLIA_CHAIN_ID }],
-                });
-            } catch (switchError) {
-                // This error code indicates that the chain has not been added to MetaMask
-                if (switchError.code === 4902) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: SEPOLIA_CHAIN_ID,
-                                chainName: 'Sepolia Testnet',
-                                nativeCurrency: {
-                                    name: 'SepoliaETH',
-                                    symbol: 'SEP',
-                                    decimals: 18
-                                },
-                                rpcUrls: ['https://sepolia.infura.io/v3/'],
-                                blockExplorerUrls: ['https://sepolia.etherscan.io']
-                            }]
-                        });
-                    } catch (addError) {
-                        showError('Could not add Sepolia network to MetaMask');
-                        return;
-                    }
-                } else {
-                    showError('Could not switch to Sepolia network');
-                    return;
-                }
+        const interval = setInterval(() => {
+            if (typeof ethers !== 'undefined') {
+                clearInterval(interval);
+                resolve();
             }
+        }, 100);
+    });
+}
+
+// Initialize blockchain connection
+async function initBlockchain() {
+    console.log('Starting blockchain initialization...');
+    try {
+        // Check if MetaMask is installed
+        if (typeof window.ethereum === 'undefined') {
+            throw new Error('MetaMask not found');
+        }
+        console.log('MetaMask found');
+
+        // Initialize Web3Provider directly from window.ethereum
+        provider = new window.ethers.BrowserProvider(window.ethereum);
+        console.log('Provider initialized');
+
+        // Get signer
+        signer = await provider.getSigner();
+        console.log('Signer initialized');
+
+        // Initialize contract
+        contract = new window.ethers.Contract(contractAddress, contractABI, signer);
+        console.log('Contract initialized:', contract.address);
+
+        return true;
+    } catch (error) {
+        console.error('Blockchain initialization error:', error);
+        showError('Failed to initialize blockchain: ' + error.message);
+        return false;
+    }
+}
+
+// Connect wallet function
+async function connectWallet() {
+    console.log('Starting wallet connection...');
+    try {
+        if (typeof window.ethereum === 'undefined') {
+            throw new Error('Please install MetaMask!');
         }
 
-        const service = services[serviceId];
-        if (!service) {
-            showError('Invalid service selected');
+        const connectButton = document.getElementById('connectWallet');
+        connectButton.innerHTML = 'Connecting...';
+
+        // Request accounts
+        console.log('Requesting accounts...');
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userWalletAddress = accounts[0];
+        console.log('Connected to wallet:', userWalletAddress);
+
+        // Initialize blockchain
+        const initialized = await initBlockchain();
+        if (!initialized) {
+            throw new Error('Failed to initialize blockchain');
+        }
+
+        // Update button
+        connectButton.innerHTML = userWalletAddress.slice(0, 6) + '...' + userWalletAddress.slice(-4);
+        connectButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+        connectButton.classList.add('bg-green-500', 'hover:bg-green-600');
+
+        showSuccess('Wallet connected successfully!');
+
+    } catch (error) {
+        console.error('Connection error:', error);
+        showError(error.message);
+        const connectButton = document.getElementById('connectWallet');
+        connectButton.innerHTML = 'Connect Wallet';
+    }
+}
+
+// File handling
+function handleFileSelect(event, service) {
+    const file = event.target.files[0];
+    const fileInfo = document.getElementById(`fileInfo-${service}`);
+    const payButton = document.getElementById(`payButton-${service}`);
+    
+    if (file) {
+        // Validate file type
+        const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            fileInfo.textContent = 'Invalid file type. Please upload PDF or image files.';
+            fileInfo.className = 'mt-2 text-sm text-red-500';
             return;
         }
 
-        const file = selectedFiles[serviceId];
-        if (!file) {
+        selectedFiles[service] = file;
+        fileInfo.textContent = `Selected: ${file.name}`;
+        fileInfo.className = 'mt-2 text-sm text-gray-500';
+        payButton.disabled = false;
+    }
+}
+
+// Payment handling
+async function handlePayment(service) {
+    try {
+        if (!userWalletAddress) {
+            throw new Error('Please connect your wallet first');
+        }
+
+        const payButton = document.getElementById(`payButton-${service}`);
+        const originalText = payButton.innerHTML || 'Pay Now';  // Save original text with fallback
+        payButton.innerHTML = '<span class="animate-spin">↻</span> Uploading...';
+        payButton.disabled = true;
+
+        if (!contract) {
+            await initBlockchain();
+        }
+
+        if (!contract) {
+            throw new Error('Contract not initialized');
+        }
+
+        if (!selectedFiles[service]) {
             throw new Error('Please upload a certificate first');
         }
 
-        // Upload file to IPFS or your preferred storage
-        const fileHash = await uploadFileToIPFS(file);
+        // Upload to Pinata
+        const formData = new FormData();
+        formData.append('file', selectedFiles[service]);
 
-        // Create the transaction parameters
-        const transactionParameters = {
-            to: PAYMENT_ADDRESS,
-            from: walletAddress,
-            value: '0x' + (service.amount * 1e18).toString(16) // Convert to Wei manually
-        };
-
-        // Send the transaction
-        const transactionHash = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [transactionParameters],
+        const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'pinata_api_key': 'f06e5fd1f9bd46842319',
+                'pinata_secret_api_key': '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
+            }
         });
 
-        showSuccess(transactionHash);
-    } catch (err) {
-        showError(err.message || 'Payment failed');
+        const ipfsHash = response.data.IpfsHash;
+        console.log('File uploaded to IPFS:', ipfsHash);
+
+        // Process payment
+        payButton.innerHTML = '<span class="animate-spin">↻</span> Processing Payment...';
+
+        console.log('Making payment for service:', service);
+        
+        // Use ethers.parseEther instead of ethers.utils.parseEther
+        const tx = await contract.makePayment(
+            service,
+            ipfsHash,
+            {
+                value: ethers.parseEther('0.001'),  // Updated for ethers v6
+                gasLimit: 300000
+            }
+        );
+
+        console.log('Transaction sent:', tx.hash);
+        const receipt = await tx.wait();
+        console.log('Transaction confirmed:', receipt);
+
+        showSuccess(`Payment successful! View certificate: https://gateway.pinata.cloud/ipfs/${ipfsHash}`);
+        
+        // Reset UI
+        payButton.innerHTML = originalText;
+        payButton.disabled = false;
+        delete selectedFiles[service];
+        document.getElementById(`certificateFile-${service}`).value = '';
+        document.getElementById(`fileInfo-${service}`).textContent = '';
+
+    } catch (error) {
+        console.error('Payment error:', error);
+        showError(error.message);
+        
+        const payButton = document.getElementById(`payButton-${service}`);
+        payButton.innerHTML = originalText || 'Pay Now';
+        payButton.disabled = false;
     }
-    // After successful wallet connection
-    document.getElementById('networkBadge').classList.remove('hidden'); 
 }
 
-async function uploadFileToIPFS(file) {
-    // Implement your file upload logic here
-    // You might want to use services like Web3.Storage, Pinata, or your own IPFS node
-    // Return the IPFS hash/CID of the uploaded file
+function showSuccess(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
 }
 
-function copyTxHash() {
-    const txHash = document.getElementById('txHash').textContent;
-    navigator.clipboard.writeText(txHash).then(() => {
-        // Show a small tooltip or notification that it was copied
-        Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: 'Hash copied to clipboard!',
-            showConfirmButton: false,
-            timer: 1500
-        });
-    });
+function showError(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
 }
 
-function handlePaymentSuccess() {
-    // Hide network badge after successful payment
-    const networkBadge = document.getElementById('networkBadge');
-    networkBadge.classList.add('hidden');
-}
+// Initialize on page load
+window.addEventListener('load', async () => {
+    console.log('Page loaded, checking wallet...');
+    try {
+        if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0) {
+                userWalletAddress = accounts[0];
+                await initBlockchain();
+                const connectButton = document.getElementById('connectWallet');
+                connectButton.innerHTML = userWalletAddress.slice(0, 6) + '...' + userWalletAddress.slice(-4);
+                connectButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                connectButton.classList.add('bg-green-500', 'hover:bg-green-600');
+            }
+        }
+    } catch (error) {
+        console.error('Initialization error:', error);
+    }
+});
