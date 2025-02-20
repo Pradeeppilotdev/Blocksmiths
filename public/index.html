@@ -61,40 +61,7 @@
             <div id="successAlert" class="fixed inset-0 flex items-center justify-center z-50 px-6 hidden">
                 <div class="bg-gray-900/80 backdrop-blur-md border border-green-500 rounded-lg p-6 max-w-xl w-full">
                     <div class="text-center">
-                        <div class="mb-4">
-                            <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold text-green-400 mb-4">Payment Successful!</h3>
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-400 mb-2">Transaction Hash:</p>
-                            <div class="flex items-center space-x-2 bg-gray-800/50 p-2 rounded">
-                                <code id="txHash" class="font-mono text-sm break-all text-gray-300"></code>
-                                <button onclick="copyTxHash()" class="p-1.5 bg-gray-700 hover:bg-gray-600 rounded transition-colors" title="Copy to clipboard">
-                                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                                    </svg>
-                                </button>
-                                <a id="txLink" href="#" target="_blank" class="p-1.5 bg-gray-700 hover:bg-gray-600 rounded transition-colors" title="View on Etherscan">
-                                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            </div>
-                            <!-- Add IPFS Link Section -->
-                            <div class="mt-4">
-                                <p class="text-sm text-gray-400 mb-2">View Uploaded File:</p>
-                                <div class="flex items-center justify-center space-x-2">
-                                    <a id="ipfsLink" href="#" target="_blank" class="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors">
-                                        <span>View on IPFS</span>
-                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Content will be dynamically inserted here -->
                     </div>
                 </div>
             </div>
