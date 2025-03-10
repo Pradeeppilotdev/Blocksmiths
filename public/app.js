@@ -192,6 +192,21 @@ const contractABI = [
 
 const SEPOLIA_CHAIN_ID = '0xaa36a7'; // Chain ID for Sepolia
 
+// Add DigiLocker configuration
+const DIGILOCKER_CONFIG = {
+    API_URL: 'YOUR_DIGILOCKER_API_ENDPOINT',
+    CLIENT_ID: 'YOUR_CLIENT_ID',
+    CLIENT_SECRET: 'YOUR_CLIENT_SECRET'
+};
+
+// Add verification state
+let userVerificationState = {
+    isVerified: false,
+    aadharVerified: false,
+    panVerified: false,
+    userData: null
+};
+
 async function checkAndSwitchNetwork() {
     if (!window.ethereum) {
         showError('Please install MetaMask to use this feature');
@@ -328,8 +343,84 @@ async function connectWallet() {
     }
 }
 
-// File handling
+// Add DigiLocker verification functions
+async function initiateDigiLockerVerification() {
+    try {
+        const response = await axios.post('/api/digilocker/initiate', {
+            walletAddress: userWalletAddress
+        });
+        
+        // Open DigiLocker authorization window
+        const authWindow = window.open(
+            response.data.authUrl,
+            'DigiLocker Authorization',
+            'width=800,height=600'
+        );
+
+        // Listen for verification completion
+        window.addEventListener('message', handleDigiLockerCallback);
+    } catch (error) {
+        showError('Failed to initiate DigiLocker verification');
+        console.error(error);
+    }
+}
+
+async function handleDigiLockerCallback(event) {
+    try {
+        if (event.data.type === 'DIGILOCKER_CALLBACK') {
+            const code = event.data.code;
+            
+            // Verify documents with DigiLocker
+            const verificationResult = await axios.post('/api/digilocker/verify', {
+                code: code,
+                walletAddress: userWalletAddress
+            });
+
+            if (verificationResult.data.verified) {
+                userVerificationState = {
+                    isVerified: true,
+                    aadharVerified: verificationResult.data.aadharVerified,
+                    panVerified: verificationResult.data.panVerified,
+                    userData: verificationResult.data.userData
+                };
+                
+                showSuccess('Documents verified successfully!');
+                updateUIAfterVerification();
+            } else {
+                throw new Error('Document verification failed');
+            }
+        }
+    } catch (error) {
+        showError('Verification failed: ' + error.message);
+        console.error(error);
+    }
+}
+
+function updateUIAfterVerification() {
+    // Update UI to show verification status
+    const verificationStatus = document.getElementById('verificationStatus');
+    verificationStatus.innerHTML = `
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            <p class="font-bold">Verified User</p>
+            <p>Aadhar: ${userVerificationState.userData.aadharNumber}</p>
+            <p>PAN: ${userVerificationState.userData.panNumber}</p>
+        </div>
+    `;
+
+    // Enable upload buttons
+    document.querySelectorAll('.upload-button').forEach(button => {
+        button.disabled = false;
+    });
+}
+
+// Modify handleFileSelect to check verification
 function handleFileSelect(event, service) {
+    if (!userVerificationState.isVerified) {
+        showError('Please verify your documents through DigiLocker first');
+        event.target.value = '';
+        return;
+    }
+
     const file = event.target.files[0];
     const fileInfo = document.getElementById(`fileInfo-${service}`);
     const payButton = document.getElementById(`payButton-${service}`);
@@ -343,11 +434,44 @@ function handleFileSelect(event, service) {
             return;
         }
 
+        // Add verification log data
+        const verificationLog = {
+            timestamp: new Date().toISOString(),
+            walletAddress: userWalletAddress,
+            aadharNumber: userVerificationState.userData.aadharNumber,
+            panNumber: userVerificationState.userData.panNumber,
+            fileName: file.name,
+            fileType: file.type,
+            service: service
+        };
+
+        // Store verification log
+        storeVerificationLog(verificationLog);
+
         selectedFiles[service] = file;
         fileInfo.textContent = `Selected: ${file.name}`;
         fileInfo.className = 'mt-2 text-sm text-gray-500';
         payButton.disabled = false;
     }
+}
+
+// Add verification log storage
+async function storeVerificationLog(logData) {
+    try {
+        await axios.post('/api/verification/log', {
+            ...logData,
+            signature: await signVerificationLog(logData)
+        });
+    } catch (error) {
+        console.error('Failed to store verification log:', error);
+    }
+}
+
+// Sign verification log with user's wallet
+async function signVerificationLog(logData) {
+    const message = JSON.stringify(logData);
+    const signature = await signer.signMessage(message);
+    return signature;
 }
 
 // Payment handling

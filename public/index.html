@@ -149,21 +149,37 @@
                     </div>
                     <p class="text-gray-400 mb-4">Pay electricity bills and new connection fees</p>
                     
-                    <!-- File Upload Section -->
+                    <!-- Add this before the file upload section -->
+                    <div class="mb-6">
+                        <div id="verificationStatus" class="mb-4">
+                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                                <p class="font-bold">Verification Required</p>
+                                <p>Please verify your documents through DigiLocker before uploading files.</p>
+                            </div>
+                        </div>
+                        
+                        <button onclick="initiateDigiLockerVerification()" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            Verify with DigiLocker
+                        </button>
+                    </div>
+
+                    <!-- Update file input buttons to be disabled by default -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-electricity"
-                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   class="hidden"
+                                   disabled
                                    accept=".pdf,.jpg,.jpeg,.png"
                                    onchange="handleFileSelect(event, 'electricity')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                            <label for="certificateFile-electricity" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
                                 <span id="fileName-electricity" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
                                 </svg>
-                            </div>
+                            </label>
                         </div>
                         <div id="fileInfo-electricity" class="mt-2 text-sm text-gray-500"></div>
                     </div>
@@ -197,21 +213,37 @@
                     </div>
                     <p class="text-gray-400 mb-4">Process water connection requests and pay bills</p>
                     
-                    <!-- File Upload Section -->
+                    <!-- Add this before the file upload section -->
+                    <div class="mb-6">
+                        <div id="verificationStatus" class="mb-4">
+                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                                <p class="font-bold">Verification Required</p>
+                                <p>Please verify your documents through DigiLocker before uploading files.</p>
+                            </div>
+                        </div>
+                        
+                        <button onclick="initiateDigiLockerVerification()" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            Verify with DigiLocker
+                        </button>
+                    </div>
+
+                    <!-- Update file input buttons to be disabled by default -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-water"
-                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   class="hidden"
+                                   disabled
                                    accept=".pdf,.jpg,.jpeg,.png"
                                    onchange="handleFileSelect(event, 'water')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                            <label for="certificateFile-water" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
                                 <span id="fileName-water" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
                                 </svg>
-                            </div>
+                            </label>
                         </div>
                         <div id="fileInfo-water" class="mt-2 text-sm text-gray-500"></div>
                     </div>
@@ -246,21 +278,37 @@
                     </div>
                     <p class="text-gray-400 mb-4">Apply and pay for construction permits</p>
                     
-                    <!-- File Upload Section -->
+                    <!-- Add this before the file upload section -->
+                    <div class="mb-6">
+                        <div id="verificationStatus" class="mb-4">
+                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                                <p class="font-bold">Verification Required</p>
+                                <p>Please verify your documents through DigiLocker before uploading files.</p>
+                            </div>
+                        </div>
+                        
+                        <button onclick="initiateDigiLockerVerification()" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            Verify with DigiLocker
+                        </button>
+                    </div>
+
+                    <!-- Update file input buttons to be disabled by default -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-building"
-                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   class="hidden"
+                                   disabled
                                    accept=".pdf,.jpg,.jpeg,.png"
                                    onchange="handleFileSelect(event, 'building')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                            <label for="certificateFile-building" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
                                 <span id="fileName-building" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
                                 </svg>
-                            </div>
+                            </label>
                         </div>
                         <div id="fileInfo-building" class="mt-2 text-sm text-gray-500"></div>
                     </div>
@@ -298,21 +346,37 @@
                     </div>
                     <p class="text-gray-400 mb-4">Get official documents verified</p>
                     
-                    <!-- File Upload Section -->
+                    <!-- Add this before the file upload section -->
+                    <div class="mb-6">
+                        <div id="verificationStatus" class="mb-4">
+                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                                <p class="font-bold">Verification Required</p>
+                                <p>Please verify your documents through DigiLocker before uploading files.</p>
+                            </div>
+                        </div>
+                        
+                        <button onclick="initiateDigiLockerVerification()" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            Verify with DigiLocker
+                        </button>
+                    </div>
+
+                    <!-- Update file input buttons to be disabled by default -->
                     <div class="mb-4">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-document"
-                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   class="hidden"
+                                   disabled
                                    accept=".pdf,.jpg,.jpeg,.png"
                                    onchange="handleFileSelect(event, 'document')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                            <label for="certificateFile-document" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
                                 <span id="fileName-document" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
                                 </svg>
-                            </div>
+                            </label>
                         </div>
                         <div id="fileInfo-document" class="mt-2 text-sm text-gray-500"></div>
                     </div>
@@ -398,33 +462,43 @@
         let selectedFiles = {};
         
         function handleFileSelect(event, service) {
+            if (!userVerificationState.isVerified) {
+                showError('Please verify your documents through DigiLocker first');
+                event.target.value = '';
+                return;
+            }
+
             const file = event.target.files[0];
-            const fileInfo = event.target.closest('.service-card').querySelector('#fileInfo-' + service);
-            const fileName = event.target.closest('.service-card').querySelector('.file-name-' + service);
-            const payButton = event.target.closest('.service-card').querySelector('#payButton-' + service);
+            const fileInfo = document.getElementById(`fileInfo-${service}`);
+            const payButton = document.getElementById(`payButton-${service}`);
             
             if (file) {
-                // Update the file name display
-                fileName.textContent = file.name;
-                
-                // Show file info
-                fileInfo.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
-                fileInfo.classList.remove('hidden');
-                
-                // Store the file
+                // Validate file type
+                const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    fileInfo.textContent = 'Invalid file type. Please upload PDF or image files.';
+                    fileInfo.className = 'mt-2 text-sm text-red-500';
+                    return;
+                }
+
+                // Add verification log data
+                const verificationLog = {
+                    timestamp: new Date().toISOString(),
+                    walletAddress: userWalletAddress,
+                    aadharNumber: userVerificationState.userData.aadharNumber,
+                    panNumber: userVerificationState.userData.panNumber,
+                    fileName: file.name,
+                    fileType: file.type,
+                    service: service
+                };
+
+                // Store verification log
+                storeVerificationLog(verificationLog);
+
                 selectedFiles[service] = file;
-                
-                // Enable pay button
+                fileInfo.textContent = `Selected: ${file.name}`;
+                fileInfo.className = 'mt-2 text-sm text-gray-500';
                 payButton.disabled = false;
-                payButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                fileName.textContent = 'Choose file';
-                fileInfo.classList.add('hidden');
-                delete selectedFiles[service];
-                
-                // Disable pay button
-                payButton.disabled = true;
-                payButton.classList.add('opacity-50', 'cursor-not-allowed');
             }
         }
     </script>
