@@ -190,6 +190,7 @@ const contractABI = [
     }
 ];
 
+<<<<<<< HEAD
 const SEPOLIA_CHAIN_ID = '0xaa36a7'; // Chain ID for Sepolia
 
 // Add DigiLocker configuration
@@ -259,6 +260,8 @@ async function checkAndSwitchNetwork() {
     }
 }
 
+=======
+>>>>>>> parent of 47712672 (blocksmiths)
 // Wait for ethers to load
 function waitForEthers() {
     return new Promise((resolve) => {
