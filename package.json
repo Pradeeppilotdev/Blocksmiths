@@ -4,9 +4,11 @@
   "type": "module",
   "dependencies": {
     "@web3-storage/multipart-parser": "^1.0.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "form-data": "^4.0.2",
+    "multer": "^1.4.5-lts.1",
     "web3.storage": "^4.5.4"
   }
 }

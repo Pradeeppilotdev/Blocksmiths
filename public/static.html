@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GovChain Pay</title>
+    <title>GovChain Pay - Static Version</title>
     
     <!-- Add favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233B82F6' stroke-width='2'><path d='M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'/><path d='M10 7h4M10 17h4M7 10v4M17 10v4' stroke-linecap='round'/></svg>">
@@ -11,9 +11,13 @@
     <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
-    <!-- Use ethers v6 -->
-    <script src="https://cdn.ethers.io/lib/ethers-6.7.0.umd.min.js"></script>
+    
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
     <!-- Add Pinata SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@pinata/sdk@latest/dist/index.browser.js"></script>
 </head>
@@ -130,12 +134,6 @@
     <section id="services" class="py-20 px-6">
         <div class="max-w-7xl mx-auto">
             <h2 class="text-3xl font-bold text-center mb-12">Available Services</h2>
-
-            
-            <!-- Error Alert -->
-            <div id="errorAlert" class="mb-8 bg-red-900/50 border-red-500 rounded-lg p-4 hidden">
-                <p class="text-red-400" id="errorText"></p>
-            </div>
 
             <!-- Services Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
@@ -288,161 +286,6 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Building Permits -->
-                <div class="service-card bg-gray-800 border border-gray-700 rounded-lg p-6">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-blue-500/10 rounded-lg">
-                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                                <polyline points="9 22 9 12 15 12 15 22" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold">Building Permits</h3>
-                    </div>
-                    <p class="text-gray-400 mb-4">Apply and pay for construction permits</p>
-                    
-                    <!-- Add this before the file upload section -->
-                    <div class="mb-6">
-                        <div id="verificationStatus" class="mb-4">
-                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-                                <p class="font-bold">Verification Required</p>
-                                <p>Please verify your PAN details before uploading files.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-400 mb-2">PAN Number</label>
-                            <input type="text" 
-                                id="panNumber" 
-                                class="w-full p-2 rounded-lg bg-gray-700 text-white" 
-                                placeholder="Enter PAN Number"
-                                maxlength="10"
-                                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" />
-                            <p class="text-xs text-gray-400 mt-1">Format: ABCDE1234F</p>
-                        </div>
-                        
-                        <button onclick="verifyPAN(event)" 
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            Verify PAN
-                        </button>
-                    </div>
-
-                    <!-- Update file input buttons to be disabled by default -->
-                    <div class="mb-4">
-                        <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <div class="relative">
-                            <input type="file" 
-                                   id="certificateFile-building"
-                                   class="hidden"
-                                   disabled
-                                   accept=".pdf,.jpg,.jpeg,.png"
-                                   onchange="handleFileSelect(event, 'building')" />
-                            <label for="certificateFile-building" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
-                                <span id="fileName-building" class="text-sm">Choose file</span>
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 4v16m-8-8h16"/>
-                                </svg>
-                            </label>
-                        </div>
-                        <div id="fileInfo-building" class="mt-2 text-sm text-gray-500"></div>
-                    </div>
-
-                    <!-- Payment Button -->
-                    <div class="flex justify-between items-center">
-                        <span class="text-blue-400 font-semibold">0.002 ETH</span>
-                        <button onclick="handlePayment('building')"
-                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
-                                id="payButton-building">
-                            <span class="payment-text">Pay Now</span>
-                            <div class="payment-loading hidden">
-                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Document Verification -->
-                <div class="service-card bg-gray-800 border border-gray-700 rounded-lg p-6">
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="p-2 bg-blue-500/10 rounded-lg">
-                            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                <polyline points="14 2 14 8 20 8" />
-                                <line x1="16" y1="13" x2="8" y2="13" />
-                                <line x1="16" y1="17" x2="8" y2="17" />
-                                <polyline points="10 9 9 9 8 9" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-semibold">Document Verification</h3>
-                    </div>
-                    <p class="text-gray-400 mb-4">Get official documents verified</p>
-                    
-                    <!-- Add this before the file upload section -->
-                    <div class="mb-6">
-                        <div id="verificationStatus" class="mb-4">
-                            <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-                                <p class="font-bold">Verification Required</p>
-                                <p>Please verify your PAN details before uploading files.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-400 mb-2">PAN Number</label>
-                            <input type="text" 
-                                id="panNumber" 
-                                class="w-full p-2 rounded-lg bg-gray-700 text-white" 
-                                placeholder="Enter PAN Number"
-                                maxlength="10"
-                                pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" />
-                            <p class="text-xs text-gray-400 mt-1">Format: ABCDE1234F</p>
-                        </div>
-                        
-                        <button onclick="verifyPAN(event)" 
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            Verify PAN
-                        </button>
-                    </div>
-
-                    <!-- Update file input buttons to be disabled by default -->
-                    <div class="mb-4">
-                        <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
-                        <div class="relative">
-                            <input type="file" 
-                                   id="certificateFile-document"
-                                   class="hidden"
-                                   disabled
-                                   accept=".pdf,.jpg,.jpeg,.png"
-                                   onchange="handleFileSelect(event, 'document')" />
-                            <label for="certificateFile-document" class="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
-                                <span id="fileName-document" class="text-sm">Choose file</span>
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 4v16m-8-8h16"/>
-                                </svg>
-                            </label>
-                        </div>
-                        <div id="fileInfo-document" class="mt-2 text-sm text-gray-500"></div>
-                    </div>
-
-                    <!-- Payment Button -->
-                    <div class="flex justify-between items-center">
-                        <span class="text-blue-400 font-semibold">0.0005 ETH</span>
-                        <button onclick="handlePayment('document')"
-                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
-                                id="payButton-document">
-                            <span class="payment-text">Pay Now</span>
-                            <div class="payment-loading hidden">
-                                <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </div>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -497,19 +340,20 @@
 
     <script>
         const CONTRACT_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="app.js"></script>
-    <script>
+        
         // Add these to your existing JavaScript variables
         let selectedFiles = {};
+        let userVerificationState = {
+            isVerified: false,
+            userData: {
+                panNumber: '',
+                name: ''
+            }
+        };
         
         function handleFileSelect(event, service) {
             if (!userVerificationState.isVerified) {
-                showError('Please verify your documents through DigiLocker first');
+                showError('Please verify your PAN details first');
                 event.target.value = '';
                 return;
             }
@@ -530,8 +374,7 @@
                 // Add verification log data
                 const verificationLog = {
                     timestamp: new Date().toISOString(),
-                    walletAddress: userWalletAddress,
-                    aadharNumber: userVerificationState.userData.aadharNumber,
+                    walletAddress: userWalletAddress || 'Not connected',
                     panNumber: userVerificationState.userData.panNumber,
                     fileName: file.name,
                     fileType: file.type,
@@ -547,6 +390,39 @@
                 payButton.disabled = false;
             }
         }
+        
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorText = document.getElementById('errorText');
+            
+            errorText.textContent = message;
+            errorAlert.classList.remove('hidden');
+            
+            setTimeout(() => {
+                errorAlert.classList.add('hidden');
+            }, 5000);
+        }
+        
+        function showSuccess(message) {
+            const successAlert = document.getElementById('successAlert');
+            
+            successAlert.querySelector('.text-center').innerHTML = `
+                <div class="flex items-center justify-center mb-4">
+                    <svg class="h-12 w-12 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Success!</h3>
+                <p class="text-gray-300 mb-6">${message}</p>
+                <button onclick="document.getElementById('successAlert').classList.add('hidden')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    OK
+                </button>
+            `;
+            
+            successAlert.classList.remove('hidden');
+        }
     </script>
+    <script src="app.js"></script>
 </body>
 </html> 

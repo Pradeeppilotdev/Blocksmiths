@@ -15,39 +15,36 @@ export async function uploadToIPFS(file, metadata = {}) {
         formData.append('file', file)
         
         // Add metadata
-        const metadataJSON = JSON.stringify({
+        formData.append('pinataMetadata', JSON.stringify({
             name: file.name,
-            keyvalues: {
-                ...metadata,
-                timestamp: new Date().toISOString()
-            }
+            keyvalues: metadata
+        }))
+        
+        // Add options
+        formData.append('pinataOptions', JSON.stringify({
+            cidVersion: 0
+        }))
+        
+        const response = await fetch('/api/upload-to-ipfs', {
+            method: 'POST',
+            body: formData
         })
-        formData.append('pinataMetadata', metadataJSON)
-
-        const response = await axios.post(
-            'https://api.pinata.cloud/pinning/pinFileToIPFS',
-            formData,
-            {
-                maxBodyLength: 'Infinity',
-                headers: {
-                    ...formData.getHeaders(),
-                    'pinata_api_key': PINATA_API_KEY,
-                    'pinata_secret_api_key': PINATA_SECRET_KEY
-                }
-            }
-        )
-
+        
+        if (!response.ok) {
+            throw new Error('Failed to upload to IPFS')
+        }
+        
+        const data = await response.json()
         return {
             success: true,
-            ipfsHash: response.data.IpfsHash,
-            url: `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`
+            cid: data.cid,
+            url: `https://gateway.pinata.cloud/ipfs/${data.cid}`
         }
-
     } catch (error) {
         console.error('IPFS upload error:', error)
         return {
             success: false,
-            error: error.response?.data || error.message
+            error: error.message
         }
     }
 } 
