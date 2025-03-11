@@ -149,16 +149,49 @@
                     </div>
                     <p class="text-gray-400 mb-4">Pay electricity bills and new connection fees</p>
                     
-                    <!-- File Upload Section -->
-                    <div class="mb-4">
+                    <!-- PAN Verification Section -->
+                    <div class="pan-verification-section mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">Verify PAN Card</label>
+                        <div class="flex space-x-2">
+                            <input type="text" 
+                                   id="panInput-electricity" 
+                                   placeholder="Enter PAN (e.g., ABCDE1234F)" 
+                                   class="bg-gray-700 text-white rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   maxlength="10"
+                                   pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}">
+                            <button onclick="verifyPAN('electricity')"
+                                    id="verifyPanButton-electricity"
+                                    class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors">
+                                Verify
+                            </button>
+                        </div>
+                        <div id="panVerificationResult-electricity" class="mt-2 text-sm hidden"></div>
+                    </div>
+                    
+                    <!-- PAN Details Section (Hidden by default) -->
+                    <div id="panDetails-electricity" class="mb-4 bg-gray-700/50 rounded-lg p-4 hidden">
+                        <h4 class="text-sm font-semibold text-blue-400 mb-2">Verified PAN Details</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-400">Name:</div>
+                            <div id="panName-electricity" class="text-white"></div>
+                            <div class="text-gray-400">DOB:</div>
+                            <div id="panDob-electricity" class="text-white"></div>
+                            <div class="text-gray-400">Address:</div>
+                            <div id="panAddress-electricity" class="text-white"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload Section (Initially Disabled) -->
+                    <div class="mb-4 file-upload-section" id="fileUploadSection-electricity">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-electricity"
                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                    accept=".pdf,.jpg,.jpeg,.png"
-                                   onchange="handleFileSelect(event, 'electricity')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                   onchange="handleFileSelect(event, 'electricity')"
+                                   disabled>
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between opacity-50 cursor-not-allowed" id="fileUploadButton-electricity">
                                 <span id="fileName-electricity" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
@@ -168,12 +201,13 @@
                         <div id="fileInfo-electricity" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
-                    <!-- Payment Button -->
+                    <!-- Payment Button (Initially Disabled) -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.001 ETH</span>
                         <button onclick="handlePayment('electricity')"
-                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
-                                id="payButton-electricity">
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors opacity-50 cursor-not-allowed"
+                                id="payButton-electricity"
+                                disabled>
                             <span class="payment-text">Pay Now</span>
                             <div class="payment-loading hidden">
                                 <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -197,16 +231,49 @@
                     </div>
                     <p class="text-gray-400 mb-4">Process water connection requests and pay bills</p>
                     
-                    <!-- File Upload Section -->
-                    <div class="mb-4">
+                    <!-- PAN Verification Section -->
+                    <div class="pan-verification-section mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">Verify PAN Card</label>
+                        <div class="flex space-x-2">
+                            <input type="text" 
+                                   id="panInput-water" 
+                                   placeholder="Enter PAN (e.g., ABCDE1234F)" 
+                                   class="bg-gray-700 text-white rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   maxlength="10"
+                                   pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}">
+                            <button onclick="verifyPAN('water')"
+                                    id="verifyPanButton-water"
+                                    class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors">
+                                Verify
+                            </button>
+                        </div>
+                        <div id="panVerificationResult-water" class="mt-2 text-sm hidden"></div>
+                    </div>
+                    
+                    <!-- PAN Details Section (Hidden by default) -->
+                    <div id="panDetails-water" class="mb-4 bg-gray-700/50 rounded-lg p-4 hidden">
+                        <h4 class="text-sm font-semibold text-blue-400 mb-2">Verified PAN Details</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-400">Name:</div>
+                            <div id="panName-water" class="text-white"></div>
+                            <div class="text-gray-400">DOB:</div>
+                            <div id="panDob-water" class="text-white"></div>
+                            <div class="text-gray-400">Address:</div>
+                            <div id="panAddress-water" class="text-white"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload Section (Initially Disabled) -->
+                    <div class="mb-4 file-upload-section" id="fileUploadSection-water">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-water"
                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                    accept=".pdf,.jpg,.jpeg,.png"
-                                   onchange="handleFileSelect(event, 'water')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                   onchange="handleFileSelect(event, 'water')"
+                                   disabled>
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between opacity-50 cursor-not-allowed" id="fileUploadButton-water">
                                 <span id="fileName-water" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
@@ -216,12 +283,13 @@
                         <div id="fileInfo-water" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
-                    <!-- Payment Button -->
+                    <!-- Payment Button (Initially Disabled) -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.0015 ETH</span>
                         <button onclick="handlePayment('water')"
-                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
-                                id="payButton-water">
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors opacity-50 cursor-not-allowed"
+                                id="payButton-water"
+                                disabled>
                             <span class="payment-text">Pay Now</span>
                             <div class="payment-loading hidden">
                                 <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -246,16 +314,49 @@
                     </div>
                     <p class="text-gray-400 mb-4">Apply and pay for construction permits</p>
                     
-                    <!-- File Upload Section -->
-                    <div class="mb-4">
+                    <!-- PAN Verification Section -->
+                    <div class="pan-verification-section mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">Verify PAN Card</label>
+                        <div class="flex space-x-2">
+                            <input type="text" 
+                                   id="panInput-building" 
+                                   placeholder="Enter PAN (e.g., ABCDE1234F)" 
+                                   class="bg-gray-700 text-white rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   maxlength="10"
+                                   pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}">
+                            <button onclick="verifyPAN('building')"
+                                    id="verifyPanButton-building"
+                                    class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors">
+                                Verify
+                            </button>
+                        </div>
+                        <div id="panVerificationResult-building" class="mt-2 text-sm hidden"></div>
+                    </div>
+                    
+                    <!-- PAN Details Section (Hidden by default) -->
+                    <div id="panDetails-building" class="mb-4 bg-gray-700/50 rounded-lg p-4 hidden">
+                        <h4 class="text-sm font-semibold text-blue-400 mb-2">Verified PAN Details</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-400">Name:</div>
+                            <div id="panName-building" class="text-white"></div>
+                            <div class="text-gray-400">DOB:</div>
+                            <div id="panDob-building" class="text-white"></div>
+                            <div class="text-gray-400">Address:</div>
+                            <div id="panAddress-building" class="text-white"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload Section (Initially Disabled) -->
+                    <div class="mb-4 file-upload-section" id="fileUploadSection-building">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-building"
                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                    accept=".pdf,.jpg,.jpeg,.png"
-                                   onchange="handleFileSelect(event, 'building')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                   onchange="handleFileSelect(event, 'building')"
+                                   disabled>
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between opacity-50 cursor-not-allowed" id="fileUploadButton-building">
                                 <span id="fileName-building" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
@@ -265,12 +366,13 @@
                         <div id="fileInfo-building" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
-                    <!-- Payment Button -->
+                    <!-- Payment Button (Initially Disabled) -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.002 ETH</span>
                         <button onclick="handlePayment('building')"
-                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
-                                id="payButton-building">
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors opacity-50 cursor-not-allowed"
+                                id="payButton-building"
+                                disabled>
                             <span class="payment-text">Pay Now</span>
                             <div class="payment-loading hidden">
                                 <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -298,16 +400,49 @@
                     </div>
                     <p class="text-gray-400 mb-4">Get official documents verified</p>
                     
-                    <!-- File Upload Section -->
-                    <div class="mb-4">
+                    <!-- PAN Verification Section -->
+                    <div class="pan-verification-section mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">Verify PAN Card</label>
+                        <div class="flex space-x-2">
+                            <input type="text" 
+                                   id="panInput-document" 
+                                   placeholder="Enter PAN (e.g., ABCDE1234F)" 
+                                   class="bg-gray-700 text-white rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   maxlength="10"
+                                   pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}">
+                            <button onclick="verifyPAN('document')"
+                                    id="verifyPanButton-document"
+                                    class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors">
+                                Verify
+                            </button>
+                        </div>
+                        <div id="panVerificationResult-document" class="mt-2 text-sm hidden"></div>
+                    </div>
+                    
+                    <!-- PAN Details Section (Hidden by default) -->
+                    <div id="panDetails-document" class="mb-4 bg-gray-700/50 rounded-lg p-4 hidden">
+                        <h4 class="text-sm font-semibold text-blue-400 mb-2">Verified PAN Details</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-400">Name:</div>
+                            <div id="panName-document" class="text-white"></div>
+                            <div class="text-gray-400">DOB:</div>
+                            <div id="panDob-document" class="text-white"></div>
+                            <div class="text-gray-400">Address:</div>
+                            <div id="panAddress-document" class="text-white"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload Section (Initially Disabled) -->
+                    <div class="mb-4 file-upload-section" id="fileUploadSection-document">
                         <label class="block text-sm text-gray-400 mb-2">Upload Certificate (PDF/Image)</label>
                         <div class="relative">
                             <input type="file" 
                                    id="certificateFile-document"
                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                    accept=".pdf,.jpg,.jpeg,.png"
-                                   onchange="handleFileSelect(event, 'document')" />
-                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between">
+                                   onchange="handleFileSelect(event, 'document')"
+                                   disabled>
+                            <div class="bg-gray-700 hover:bg-gray-600 text-white rounded-lg px-4 py-2 flex items-center justify-between opacity-50 cursor-not-allowed" id="fileUploadButton-document">
                                 <span id="fileName-document" class="text-sm">Choose file</span>
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 4v16m-8-8h16"/>
@@ -317,12 +452,13 @@
                         <div id="fileInfo-document" class="mt-2 text-sm text-gray-500"></div>
                     </div>
 
-                    <!-- Payment Button -->
+                    <!-- Payment Button (Initially Disabled) -->
                     <div class="flex justify-between items-center">
                         <span class="text-blue-400 font-semibold">0.0005 ETH</span>
                         <button onclick="handlePayment('document')"
-                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors"
-                                id="payButton-document">
+                                class="service-pay flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm transition-colors opacity-50 cursor-not-allowed"
+                                id="payButton-document"
+                                disabled>
                             <span class="payment-text">Pay Now</span>
                             <div class="payment-loading hidden">
                                 <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -388,45 +524,33 @@
     <script>
         const CONTRACT_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
     </script>
+    <!-- Load dependencies in correct order -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="app.js"></script>
     <script>
-        // Add these to your existing JavaScript variables
-        let selectedFiles = {};
-        
-        function handleFileSelect(event, service) {
-            const file = event.target.files[0];
-            const fileInfo = event.target.closest('.service-card').querySelector('#fileInfo-' + service);
-            const fileName = event.target.closest('.service-card').querySelector('.file-name-' + service);
-            const payButton = event.target.closest('.service-card').querySelector('#payButton-' + service);
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add input validation for PAN fields
+            const panInputs = document.querySelectorAll('[id^="panInput-"]');
+            panInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            });
             
-            if (file) {
-                // Update the file name display
-                fileName.textContent = file.name;
-                
-                // Show file info
-                fileInfo.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
-                fileInfo.classList.remove('hidden');
-                
-                // Store the file
-                selectedFiles[service] = file;
-                
-                // Enable pay button
-                payButton.disabled = false;
-                payButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                fileName.textContent = 'Choose file';
-                fileInfo.classList.add('hidden');
-                delete selectedFiles[service];
-                
-                // Disable pay button
-                payButton.disabled = true;
-                payButton.classList.add('opacity-50', 'cursor-not-allowed');
-            }
-        }
+            // Disable file upload and payment buttons initially
+            const fileInputs = document.querySelectorAll('[id^="certificateFile-"]');
+            fileInputs.forEach(input => {
+                input.disabled = true;
+            });
+            
+            const payButtons = document.querySelectorAll('[id^="payButton-"]');
+            payButtons.forEach(button => {
+                button.disabled = true;
+            });
+        });
     </script>
 </body>
 </html> 

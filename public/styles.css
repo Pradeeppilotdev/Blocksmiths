@@ -13,10 +13,11 @@
 
 /* Text Effects */
 .gradient-text {
-    background: linear-gradient(45deg, #60a5fa, #3b82f6);
-    background-clip: text;
+    background: linear-gradient(90deg, #3B82F6, #10B981);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    display: inline;
 }
 
 /* Add to your existing styles */
@@ -28,4 +29,66 @@
     0% { opacity: 1; }
     70% { opacity: 1; }
     100% { opacity: 0; }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1F2937;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4B5563;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6B7280;
+}
+
+/* PAN Verification Styles */
+.pan-verification-section input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.pan-verification-result {
+    transition: all 0.3s ease;
+}
+
+.pan-details {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* File upload button styles */
+.file-upload-section .file-upload-button {
+    transition: all 0.3s ease;
+}
+
+.file-upload-section .file-upload-button:hover:not(.cursor-not-allowed) {
+    background-color: #4B5563;
+}
+
+/* Payment button pulse animation */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+.payment-ready {
+    animation: pulse 2s infinite;
 } 
