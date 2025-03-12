@@ -320,7 +320,109 @@ async function initBlockchain() {
     }
 }
 
-// Connect wallet function
+// Function to disable all service interactions
+function disableAllServiceInteractions() {
+    // Disable all PAN verification inputs and buttons
+    document.querySelectorAll('[id^="panInput-"]').forEach(input => {
+        input.disabled = true;
+        input.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-700');
+    });
+    
+    document.querySelectorAll('[id^="verifyPanButton-"]').forEach(button => {
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+    });
+    
+    // Disable all file inputs
+    document.querySelectorAll('[id^="certificateFile-"]').forEach(input => {
+        input.disabled = true;
+    });
+    
+    document.querySelectorAll('[id^="fileUploadButton-"]').forEach(button => {
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+    });
+    
+    // Disable all payment buttons
+    document.querySelectorAll('.service-pay').forEach(button => {
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+    });
+}
+
+// Function to enable all service interactions
+function enableAllServiceInteractions() {
+    // Enable all PAN verification inputs and buttons
+    document.querySelectorAll('[id^="panInput-"]').forEach(input => {
+        input.disabled = false;
+        input.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-700');
+    });
+    
+    document.querySelectorAll('[id^="verifyPanButton-"]').forEach(button => {
+        button.disabled = false;
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+    });
+    
+    // File inputs and payment buttons will be enabled based on PAN verification
+}
+
+// Modify disconnectWallet function
+async function disconnectWallet() {
+    try {
+        userWalletAddress = null;
+        provider = null;
+        signer = null;
+        contract = null;
+
+        // Update UI
+        const connectButton = document.getElementById('connectWallet');
+        connectButton.innerHTML = `
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+                <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                <path d="M18 12h.01" />
+            </svg>
+            <span>Connect Wallet</span>
+        `;
+        connectButton.classList.remove('bg-green-500', 'hover:bg-green-600');
+        connectButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
+        connectButton.onclick = connectWallet;
+
+        // Hide network badge
+        document.getElementById('networkBadge').classList.add('hidden');
+
+        // Disable all service interactions
+        disableAllServiceInteractions();
+
+        // Clear any existing verifications and selections
+        verifiedPANs = {};
+        Object.keys(selectedFiles).forEach(key => delete selectedFiles[key]);
+
+        // Reset all file inputs
+        document.querySelectorAll('[id^="certificateFile-"]').forEach(input => {
+            input.value = '';
+        });
+
+        // Reset all file info texts
+        document.querySelectorAll('[id^="fileInfo-"]').forEach(info => {
+            info.textContent = '';
+        });
+
+        // Hide all PAN verification results and details
+        document.querySelectorAll('[id^="panVerificationResult-"]').forEach(result => {
+            result.classList.add('hidden');
+        });
+        document.querySelectorAll('[id^="panDetails-"]').forEach(details => {
+            details.classList.add('hidden');
+        });
+
+        showSuccess('Wallet disconnected successfully!');
+    } catch (error) {
+        console.error('Disconnection error:', error);
+        showError(error.message);
+    }
+}
+
+// Modify connectWallet function
 async function connectWallet() {
     console.log('Starting wallet connection...');
     try {
@@ -344,9 +446,20 @@ async function connectWallet() {
         }
 
         // Update button
-        connectButton.innerHTML = userWalletAddress.slice(0, 6) + '...' + userWalletAddress.slice(-4);
+        connectButton.innerHTML = `
+            <div class="flex items-center">
+                <span class="mr-2">${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}</span>
+                <svg class="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        `;
         connectButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
         connectButton.classList.add('bg-green-500', 'hover:bg-green-600');
+        connectButton.onclick = disconnectWallet;
+
+        // Enable all service interactions
+        enableAllServiceInteractions();
 
         showSuccess('Wallet connected successfully!');
 
@@ -355,7 +468,79 @@ async function connectWallet() {
         showError(error.message);
         const connectButton = document.getElementById('connectWallet');
         connectButton.innerHTML = 'Connect Wallet';
+        disableAllServiceInteractions();
     }
+}
+
+// Modify window load event listener
+window.addEventListener('load', async () => {
+    console.log('Page loaded, checking wallet...');
+    
+    // Add reveal class to sections
+    document.querySelectorAll('section').forEach(section => {
+        section.classList.add('reveal');
+    });
+    
+    // Initial check for reveals
+    revealOnScroll();
+    
+    // Add scroll event listener
+    window.addEventListener('scroll', revealOnScroll);
+    
+    // Initially disable all service interactions
+    disableAllServiceInteractions();
+    
+    try {
+        if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0) {
+                userWalletAddress = accounts[0];
+                await initBlockchain();
+                const connectButton = document.getElementById('connectWallet');
+                connectButton.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="mr-2">${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}</span>
+                        <svg class="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                `;
+                connectButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                connectButton.classList.add('bg-green-500', 'hover:bg-green-600');
+                connectButton.onclick = disconnectWallet;
+                
+                // Enable service interactions if wallet is connected
+                enableAllServiceInteractions();
+            }
+        }
+    } catch (error) {
+        console.error('Initialization error:', error);
+        disableAllServiceInteractions();
+    }
+});
+
+// Add event listener for account changes
+if (window.ethereum) {
+    window.ethereum.on('accountsChanged', async (accounts) => {
+        if (accounts.length === 0) {
+            // User disconnected their wallet
+            await disconnectWallet();
+        } else {
+            // User switched accounts
+            userWalletAddress = accounts[0];
+            await initBlockchain();
+            const connectButton = document.getElementById('connectWallet');
+            connectButton.innerHTML = `
+                <div class="flex items-center">
+                    <span class="mr-2">${userWalletAddress.slice(0, 6)}...${userWalletAddress.slice(-4)}</span>
+                    <svg class="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            `;
+            enableAllServiceInteractions();
+        }
+    });
 }
 
 // PAN Verification function
@@ -449,17 +634,30 @@ function handleFileSelect(event, service) {
         if (!validTypes.includes(file.type)) {
             fileInfo.textContent = 'Invalid file type. Please upload PDF or image files.';
             fileInfo.className = 'mt-2 text-sm text-red-500';
+            payButton.disabled = true;
+            payButton.classList.add('opacity-50', 'cursor-not-allowed');
+            return;
+        }
+
+        // Validate file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size > maxSize) {
+            fileInfo.textContent = 'File too large. Maximum size is 10MB.';
+            fileInfo.className = 'mt-2 text-sm text-red-500';
+            payButton.disabled = true;
+            payButton.classList.add('opacity-50', 'cursor-not-allowed');
             return;
         }
 
         selectedFiles[service] = file;
         fileInfo.textContent = `Selected: ${file.name}`;
-        fileInfo.className = 'mt-2 text-sm text-gray-500';
+        fileInfo.className = 'mt-2 text-sm text-green-500 fade-in';
         
         // Enable payment button only if PAN is verified
         if (verifiedPANs[service]) {
             payButton.disabled = false;
             payButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            payButton.classList.add('payment-ready');
         }
     } else {
         fileInfo.textContent = '';
@@ -468,6 +666,7 @@ function handleFileSelect(event, service) {
         // Disable payment button
         payButton.disabled = true;
         payButton.classList.add('opacity-50', 'cursor-not-allowed');
+        payButton.classList.remove('payment-ready');
     }
 }
 
@@ -485,9 +684,13 @@ async function handlePayment(service) {
             throw new Error('Please verify your PAN first');
         }
 
+        if (!selectedFiles[service]) {
+            throw new Error('Please upload a certificate first');
+        }
+
         // Save original button text
         originalText = payButton.querySelector('.payment-text').textContent;
-        payButton.innerHTML = '<span class="animate-spin">↻</span> Uploading...';
+        payButton.innerHTML = '<span class="animate-spin">↻</span> Processing Payment...';
         payButton.disabled = true;
 
         if (!contract) {
@@ -498,27 +701,46 @@ async function handlePayment(service) {
             throw new Error('Contract not initialized');
         }
 
-        if (!selectedFiles[service]) {
-            throw new Error('Please upload a certificate first');
-        }
-
         // Get PAN details for metadata
         const panData = mockPANDatabase[verifiedPANs[service]];
-        
-        // Upload to Pinata
-        const formData = new FormData();
-        formData.append('file', selectedFiles[service]);
-        
-        // Add metadata with PAN details
-        const metadata = JSON.stringify({
-            name: `${service} Certificate`,
-            description: `${service} payment certificate for ${panData.name}`,
-            pan: verifiedPANs[service],
-            timestamp: new Date().toISOString()
-        });
-        formData.append('pinataMetadata', metadata);
 
         try {
+            // Process payment first
+            console.log('Making payment for service:', service);
+            
+            // Use ethers.parseEther instead of ethers.utils.parseEther
+            const tx = await contract.makePayment(
+                service,
+                "pending", // Temporary hash until file is uploaded
+                {
+                    value: ethers.parseEther('0.001'),  // Updated for ethers v6
+                    gasLimit: 300000
+                }
+            );
+
+            console.log('Transaction sent:', tx.hash);
+            payButton.innerHTML = '<span class="animate-spin">↻</span> Confirming Payment...';
+            
+            const receipt = await tx.wait();
+            console.log('Transaction confirmed:', receipt);
+
+            // Now upload to IPFS after payment confirmation
+            payButton.innerHTML = '<span class="animate-spin">↻</span> Uploading to IPFS...';
+
+            // Upload to Pinata
+            const formData = new FormData();
+            formData.append('file', selectedFiles[service]);
+            
+            // Add metadata with PAN details
+            const metadata = JSON.stringify({
+                name: `${service} Certificate`,
+                description: `${service} payment certificate for ${panData.name}`,
+                pan: verifiedPANs[service],
+                timestamp: new Date().toISOString(),
+                transactionHash: tx.hash
+            });
+            formData.append('pinataMetadata', metadata);
+
             const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -530,26 +752,7 @@ async function handlePayment(service) {
             const ipfsHash = response.data.IpfsHash;
             console.log('File uploaded to IPFS:', ipfsHash);
 
-            // Process payment
-            payButton.innerHTML = '<span class="animate-spin">↻</span> Processing Payment...';
-
-            console.log('Making payment for service:', service);
-            
-            // Use ethers.parseEther instead of ethers.utils.parseEther
-            const tx = await contract.makePayment(
-                service,
-                ipfsHash,
-                {
-                    value: ethers.parseEther('0.001'),  // Updated for ethers v6
-                    gasLimit: 300000
-                }
-            );
-
-            console.log('Transaction sent:', tx.hash);
-            const receipt = await tx.wait();
-            console.log('Transaction confirmed:', receipt);
-
-            // Show success message with PAN details
+            // Show success message with PAN details and transaction info
             showSuccess(`
                 <h3 class="text-xl font-bold mb-4">Payment Successful!</h3>
                 <p class="mb-4">Your payment for ${service} has been processed.</p>
@@ -557,6 +760,7 @@ async function handlePayment(service) {
                     <p><span class="text-gray-400">Name:</span> ${panData.name}</p>
                     <p><span class="text-gray-400">PAN:</span> ${verifiedPANs[service]}</p>
                     <p><span class="text-gray-400">Service:</span> ${service}</p>
+                    <p><span class="text-gray-400">Transaction:</span> <a href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank" class="text-blue-400 hover:underline">View Transaction</a></p>
                     <p><span class="text-gray-400">Certificate:</span> <a href="https://gateway.pinata.cloud/ipfs/${ipfsHash}" target="_blank" class="text-blue-400 hover:underline">View Certificate</a></p>
                 </div>
             `);
@@ -578,8 +782,8 @@ async function handlePayment(service) {
             // Disable payment button again
             payButton.classList.add('opacity-50', 'cursor-not-allowed');
 
-        } catch (uploadError) {
-            throw new Error('Failed to upload file: ' + uploadError.message);
+        } catch (error) {
+            throw new Error('Transaction failed: ' + error.message);
         }
 
     } catch (error) {
@@ -619,22 +823,16 @@ function showError(message) {
     setTimeout(() => toast.remove(), 5000);
 }
 
-// Initialize on page load
-window.addEventListener('load', async () => {
-    console.log('Page loaded, checking wallet...');
-    try {
-        if (window.ethereum) {
-            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-            if (accounts.length > 0) {
-                userWalletAddress = accounts[0];
-                await initBlockchain();
-                const connectButton = document.getElementById('connectWallet');
-                connectButton.innerHTML = userWalletAddress.slice(0, 6) + '...' + userWalletAddress.slice(-4);
-                connectButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-                connectButton.classList.add('bg-green-500', 'hover:bg-green-600');
-            }
+// Add scroll reveal animation
+function revealOnScroll() {
+    const reveals = document.querySelectorAll('.reveal');
+    
+    reveals.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+            element.classList.add('active');
         }
-    } catch (error) {
-        console.error('Initialization error:', error);
-    }
-});
+    });
+}
