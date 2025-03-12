@@ -7,6 +7,7 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .container {
@@ -16,7 +17,9 @@ body {
   flex-direction: column;
   text-align: center;
   width: 100%;
-  max-width: 500px; /* Increased max-width for larger container */
+  max-width: 500px;
+  padding: clamp(15px, 3vw, 30px);
+  margin: 0 auto;
 }
 
 .form_area {
@@ -27,32 +30,34 @@ body {
   background-color: #374151;
   height: auto;
   width: 100%;
-  padding: 30px 20px; /* Added padding for more space inside */
+  padding: clamp(20px, 4vw, 30px);
   border: 2px solid #264143;
-  border-radius: 20px;
+  border-radius: clamp(10px, 2vw, 20px);
   box-shadow: 3px 4px 0px 1px #3b82f6;
 }
 
 .title {
   color: white;
   font-weight: 900;
-  font-size: 2em; /* Increased font size */
-  margin-top: 20px;
-  margin-bottom: 20px; /* Added bottom margin */
+  font-size: clamp(1.5em, 5vw, 2em);
+  margin-top: clamp(10px, 3vw, 20px);
+  margin-bottom: clamp(10px, 3vw, 20px);
+  line-height: 1.2;
 }
 
 .sub_title {
   color: white;
   font-weight: 600;
   margin: 5px 0;
+  font-size: clamp(14px, 3vw, 16px);
 }
 
 .form_group {
   display: flex;
   flex-direction: column;
   align-items: baseline;
-  margin: 15px 0; /* Increased margin */
-  width: 90%; /* Reduced from 100% to create some margin */
+  margin: clamp(10px, 2vw, 15px) 0;
+  width: 90%;
 }
 
 form {
@@ -67,16 +72,16 @@ form {
   border: 2px solid #264143;
   box-shadow: 3px 4px 0px 1px #3b82f6;
   width: 100%;
-  padding: 15px; /* Increased padding */
+  padding: clamp(12px, 2vw, 15px);
   border-radius: 4px;
-  font-size: 16px; /* Increased font size */
+  font-size: clamp(14px, 3vw, 16px);
   box-sizing: border-box;
-  background-color: #1f2937; /* Darker background for input */
+  background-color: #1f2937;
   color: white;
 }
 
 .form_style::placeholder {
-  color: #9ca3af; /* Lighter color for placeholder text */
+  color: #9ca3af;
 }
 
 .form_style:focus, .btn:focus {
@@ -85,10 +90,10 @@ form {
 }
 
 .btn {
-  padding: 18px; /* Increased padding */
-  margin: 30px 0px; /* Increased margin */
-  width: 90%; /* Match the width of form_group */
-  font-size: 18px; /* Increased font size */
+  padding: clamp(15px, 3vw, 18px);
+  margin: clamp(20px, 4vw, 30px) 0px;
+  width: 90%;
+  font-size: clamp(16px, 3vw, 18px);
   background: #3b82f6;
   border-radius: 10px;
   font-weight: 800;
@@ -96,10 +101,13 @@ form {
   cursor: pointer;
   color: white;
   border: none;
+  transition: all 0.3s ease;
 }
 
 .btn:hover {
   opacity: .9;
+  transform: translateY(2px);
+  box-shadow: 2px 2px 0px 0px white;
 }
 
 .link {
@@ -107,17 +115,18 @@ form {
   color: #3b82f6;
   padding: 5px;
   text-decoration: none;
+  font-size: clamp(14px, 3vw, 16px);
 }
 
-/* Text color for paragraph */
 p {
   color: white;
+  font-size: clamp(14px, 3vw, 16px);
+  line-height: 1.5;
 }
 
-/* Styles for validation error messages */
 .error-message {
   color: #ff6b6b;
-  font-size: 14px;
+  font-size: clamp(12px, 2.5vw, 14px);
   margin-top: 5px;
   text-align: left;
   width: 100%;
