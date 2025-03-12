@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocksmiths - Admin Dashboard</title>
+    <link rel="stylesheet" href="superuser.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/documents.css">
+    <link rel="stylesheet" href="styles/contracts.css">
+    <link rel="stylesheet" href="styles/settings.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Blocksmiths</div>
+                <span class="admin-badge">Admin</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="#users"><i class="fas fa-users"></i> Users</a>
+                    </li>
+                    <li>
+                        <a href="#documents"><i class="fas fa-file-alt"></i> Documents</a>
+                    </li>
+                    <li>
+                        <a href="#contracts"><i class="fas fa-file-contract"></i> Contracts</a>
+                    </li>
+                    
+                    <li>
+                        <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="#logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                
+                <div class="user-actions">
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="messages">
+                        <i class="fas fa-envelope"></i>
+                        <span class="badge">5</span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://via.placeholder.com/40" alt="Admin">
+                        <span>Admin</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Overview Section -->
+            <section id="dashboard" class="dashboard-section active">
+                <h1>Dashboard Overview</h1>
+                
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Total Users</h3>
+                            <p class="stat-number">1,254</p>
+                            <p class="stat-change positive"><i class="fas fa-arrow-up"></i> 12% this month</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon projects">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Active Projects</h3>
+                            <p class="stat-number">42</p>
+                            <p class="stat-change positive"><i class="fas fa-arrow-up"></i> 8% this month</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Revenue</h3>
+                            <p class="stat-number">$125,400</p>
+                            <p class="stat-change positive"><i class="fas fa-arrow-up"></i> 23% this month</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon contracts">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Smart Contracts</h3>
+                            <p class="stat-number">87</p>
+                            <p class="stat-change negative"><i class="fas fa-arrow-down"></i> 5% this month</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3>User Growth</h3>
+                            <div class="chart-actions">
+                                <button class="active">Weekly</button>
+                                <button>Monthly</button>
+                                <button>Yearly</button>
+                            </div>
+                        </div>
+                        <div class="chart" id="userGrowthChart">
+                            <!-- Chart will be rendered here by JS -->
+                            <div class="chart-placeholder">
+                                <div class="bar" style="height: 30%"></div>
+                                <div class="bar" style="height: 45%"></div>
+                                <div class="bar" style="height: 60%"></div>
+                                <div class="bar" style="height: 40%"></div>
+                                <div class="bar" style="height: 75%"></div>
+                                <div class="bar" style="height: 90%"></div>
+                                <div class="bar" style="height: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <ul class="activity-list">
+                            <li>
+                                <div class="activity-icon"><i class="fas fa-user-plus"></i></div>
+                                <div class="activity-details">
+                                    <p><strong>New User Registration</strong></p>
+                                    <p>John Doe registered a new account</p>
+                                    <p class="activity-time">2 minutes ago</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="activity-icon"><i class="fas fa-code-branch"></i></div>
+                                <div class="activity-details">
+                                    <p><strong>New Contract Deployed</strong></p>
+                                    <p>NFT Marketplace contract deployed to mainnet</p>
+                                    <p class="activity-time">45 minutes ago</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="activity-icon"><i class="fas fa-dollar-sign"></i></div>
+                                <div class="activity-details">
+                                    <p><strong>Payment Received</strong></p>
+                                    <p>Payment of $5,400 received for Project #42</p>
+                                    <p class="activity-time">1 hour ago</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="activity-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="activity-details">
+                                    <p><strong>Security Alert</strong></p>
+                                    <p>Unusual login attempt detected</p>
+                                    <p class="activity-time">3 hours ago</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="recent-users">
+                    <div class="section-header">
+                        <h3>Recent Users</h3>
+                        <a href="#users" class="view-all">View All</a>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#1001</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="https://via.placeholder.com/30" alt="User">
+                                            <span>John Doe</span>
+                                        </div>
+                                    </td>
+                                    <td>john.doe@example.com</td>
+                                    <td>May 15, 2023</td>
+                                    <td><span class="status active">Active</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1002</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="https://via.placeholder.com/30" alt="User">
+                                            <span>Jane Smith</span>
+                                        </div>
+                                    </td>
+                                    <td>jane.smith@example.com</td>
+                                    <td>May 16, 2023</td>
+                                    <td><span class="status active">Active</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#1003</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <img src="https://via.placeholder.com/30" alt="User">
+                                            <span>Robert Johnson</span>
+                                        </div>
+                                    </td>
+                                    <td>robert.j@example.com</td>
+                                    <td>May 18, 2023</td>
+                                    <td><span class="status inactive">Inactive</span></td>
+                                    <td>
+                                        <div class="actions">
+                                            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                            <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users" class="dashboard-section">
+                <h1>User Management</h1>
+                
+                <div class="section-actions">
+                    <div class="search-filter">
+                        <input type="text" placeholder="Search users...">
+                        <select>
+                            <option value="all">All Users</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="admin">Admins</option>
+                        </select>
+                    </div>
+                    <button class="primary-btn"><i class="fas fa-plus"></i> Add New User</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#1001</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="https://via.placeholder.com/30" alt="User">
+                                        <span>John Doe</span>
+                                    </div>
+                                </td>
+                                <td>john.doe@example.com</td>
+                                <td>Developer</td>
+                                <td>May 15, 2023</td>
+                                <td><span class="status active">Active</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#1002</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="https://via.placeholder.com/30" alt="User">
+                                        <span>Jane Smith</span>
+                                    </div>
+                                </td>
+                                <td>jane.smith@example.com</td>
+                                <td>Designer</td>
+                                <td>May 16, 2023</td>
+                                <td><span class="status active">Active</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#1003</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="https://via.placeholder.com/30" alt="User">
+                                        <span>Robert Johnson</span>
+                                    </div>
+                                </td>
+                                <td>robert.j@example.com</td>
+                                <td>Client</td>
+                                <td>May 18, 2023</td>
+                                <td><span class="status inactive">Inactive</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#1004</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="https://via.placeholder.com/30" alt="User">
+                                        <span>Emily Davis</span>
+                                    </div>
+                                </td>
+                                <td>emily.d@example.com</td>
+                                <td>Admin</td>
+                                <td>May 20, 2023</td>
+                                <td><span class="status active">Active</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#1005</td>
+                                <td>
+                                    <div class="user-info">
+                                        <img src="https://via.placeholder.com/30" alt="User">
+                                        <span>Michael Wilson</span>
+                                    </div>
+                                </td>
+                                <td>michael.w@example.com</td>
+                                <td>Developer</td>
+                                <td>May 22, 2023</td>
+                                <td><span class="status active">Active</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                        <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <span>...</span>
+                    <button class="page-btn">10</button>
+                    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            <!-- Documents Section -->
+            <section id="documents" class="dashboard-section">
+                <h1>DOCS Management</h1>
+                
+                <div class="section-actions">
+                    <div class="search-filter">
+                        <input type="text" placeholder="Search documents...">
+                        <select>
+                            <option value="all">All Documents</option>
+                            <option value="pending">Pending Review</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <button class="primary-btn"><i class="fas fa-upload"></i> Upload Document</button>
+                </div>
+                
+                <div class="documents-grid">
+                    <div class="document-card">
+                        <div class="document-header">
+                            <span class="document-status pending">Pending Review</span>
+                            <div class="document-actions">
+                                <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <h3>John Smith</h3>
+                            <p class="user-email">john.smith@example.com</p>
+                            <p class="wallet-address">0x1234...5678</p>
+                        </div>
+                        <div class="document-details">
+                            <div class="meta-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>KYC Documents.pdf</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Uploaded: Jun 15, 2023</span>
+                            </div>
+                        </div>
+                        <div class="document-actions-footer">
+                            <button class="view-btn">View Document</button>
+                            <div class="approval-buttons">
+                                <button class="approve-btn"><i class="fas fa-check"></i></button>
+                                <button class="reject-btn"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-header">
+                            <span class="document-status approved">Approved</span>
+                            <div class="document-actions">
+                                <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <h3>Sarah Johnson</h3>
+                            <p class="user-email">sarah.j@example.com</p>
+                            <p class="wallet-address">0x9876...4321</p>
+                        </div>
+                        <div class="document-details">
+                            <div class="meta-item">
+                                <i class="fas fa-file-image"></i>
+                                <span>Identity Verification.jpg</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Uploaded: Jun 10, 2023</span>
+                            </div>
+                        </div>
+                        <div class="document-actions-footer">
+                            <button class="view-btn">View Document</button>
+                            <div class="approval-buttons">
+                                <button class="approve-btn active"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contracts Section -->
+            <section id="contracts" class="dashboard-section">
+                <h1>Smart Contracts</h1>
+                
+                <div class="section-actions">
+                    <div class="search-filter">
+                        <input type="text" placeholder="Search contracts...">
+                        <select>
+                            <option value="all">All Networks</option>
+                            <option value="ethereum">Ethereum</option>
+                            <option value="polygon">Polygon</option>
+                            <option value="solana">Solana</option>
+                            <option value="binance">Binance Smart Chain</option>
+                        </select>
+                    </div>
+                    <button class="primary-btn"><i class="fas fa-plus"></i> Deploy New Contract</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Contract Name</th>
+                                <th>Address</th>
+                                <th>Network</th>
+                                <th>Deployed Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="contract-info">
+                                        <i class="fas fa-file-contract"></i>
+                                        <span>NFT Marketplace</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="address-container">
+                                        <span class="contract-address">0x7a2...3f9b</span>
+                                        <button class="copy-btn"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                </td>
+                                <td>Ethereum</td>
+                                <td>May 15, 2023</td>
+                                <td><span class="status active">Verified</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn"><i class="fas fa-code"></i></button>
+                                        <button class="action-btn"><i class="fas fa-external-link-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="contract-info">
+                                        <i class="fas fa-file-contract"></i>
+                                        <span>Token Contract</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="address-container">
+                                        <span class="contract-address">0x9c1...7e2d</span>
+                                        <button class="copy-btn"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                </td>
+                                <td>Polygon</td>
+                                <td>May 20, 2023</td>
+                                <td><span class="status active">Verified</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn"><i class="fas fa-code"></i></button>
+                                        <button class="action-btn"><i class="fas fa-external-link-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="contract-info">
+                                        <i class="fas fa-file-contract"></i>
+                                        <span>Staking Contract</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="address-container">
+                                        <span class="contract-address">0x3f5...8a1c</span>
+                                        <button class="copy-btn"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                </td>
+                                <td>Binance Smart Chain</td>
+                                <td>May 25, 2023</td>
+                                <td><span class="status pending">Pending</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn"><i class="fas fa-code"></i></button>
+                                        <button class="action-btn"><i class="fas fa-external-link-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="contract-info">
+                                        <i class="fas fa-file-contract"></i>
+                                        <span>DAO Governance</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="address-container">
+                                        <span class="contract-address">0x6d2...9f4e</span>
+                                        <button class="copy-btn"><i class="fas fa-copy"></i></button>
+                                    </div>
+                                </td>
+                                <td>Ethereum</td>
+                                <td>Jun 01, 2023</td>
+                                <td><span class="status active">Verified</span></td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                                        <button class="action-btn"><i class="fas fa-code"></i></button>
+                                        <button class="action-btn"><i class="fas fa-external-link-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="contract-details">
+                    <h2>Contract Details</h2>
+                    <div class="contract-tabs">
+                        <button class="tab-btn active">Overview</button>
+                        <button class="tab-btn">Code</button>
+                        <button class="tab-btn">Transactions</button>
+                        <button class="tab-btn">Events</button>
+                    </div>
+                    <div class="contract-content">
+                        <div class="contract-overview">
+                            <div class="detail-item">
+                                <span class="detail-label">Contract Name:</span>
+                                <span class="detail-value">NFT Marketplace</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Contract Address:</span>
+                                <span class="detail-value">0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Network:</span>
+                                <span class="detail-value">Ethereum Mainnet</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Compiler Version:</span>
+                                <span class="detail-value">Solidity 0.8.7</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Optimization:</span>
+                                <span class="detail-value">Enabled with 200 runs</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Deployed Date:</span>
+                                <span class="detail-value">May 15, 2023 at 14:30:45 UTC</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Transaction Hash:</span>
+                                <span class="detail-value">0x8a6b8f2d9b5d7e8c9a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+           
+
+            <!-- Settings Section -->
+            <section id="settings" class="dashboard-section">
+                <h1>System Settings</h1>
+                
+                <div class="settings-container">
+                    <div class="settings-sidebar">
+                        <ul class="settings-nav">
+                            <li class="active"><a href="#general-settings">General</a></li>
+                            <li><a href="#account-settings">Account</a></li>
+                            <li><a href="#security-settings">Security</a></li>
+                            <li><a href="#notification-settings">Notifications</a></li>
+                            <li><a href="#api-settings">API Keys</a></li>
+                            <li><a href="#blockchain-settings">Blockchain</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <div id="general-settings" class="settings-panel active">
+                            <h2>General Settings</h2>
+                            
+                            <form class="settings-form">
+                                <div class="form-group">
+                                    <label>Platform Name</label>
+                                    <input type="text" value="Blocksmiths Admin Dashboard">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Time Zone</label>
+                                    <select>
+                                        <option value="utc">UTC (Coordinated Universal Time)</option>
+                                        <option value="est" selected>EST (Eastern Standard Time)</option>
+                                        <option value="pst">PST (Pacific Standard Time)</option>
+                                        <option value="gmt">GMT (Greenwich Mean Time)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Date Format</label>
+                                    <select>
+                                        <option value="mdy" selected>MM/DD/YYYY</option>
+                                        <option value="dmy">DD/MM/YYYY</option>
+                                        <option value="ymd">YYYY/MM/DD</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Language</label>
+                                    <select>
+                                        <option value="en" selected>English</option>
+                                        <option value="es">Spanish</option>
+                                        <option value="fr">French</option>
+                                        <option value="de">German</option>
+                                        <option value="zh">Chinese</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Theme</label>
+                                    <div class="theme-options">
+                                        <div class="theme-option active">
+                                            <div class="theme-preview light"></div>
+                                            <span>Light</span>
+                                        </div>
+                                        <div class="theme-option">
+                                            <div class="theme-preview dark"></div>
+                                            <span>Dark</span>
+                                        </div>
+                                        <div class="theme-option">
+                                            <div class="theme-preview system"></div>
+                                            <span>System</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="primary-btn">Save Changes</button>
+                                    <button type="reset" class="secondary-btn">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div id="account-settings" class="settings-panel">
+                            <h2>Account Settings</h2>
+                            
+                            <div class="profile-settings">
+                                <div class="profile-image">
+                                    <img src="https://via.placeholder.com/100" alt="Profile">
+                                    <button class="change-image-btn"><i class="fas fa-camera"></i></button>
+                                </div>
+                                
+                                <form class="settings-form">
+                                    <div class="form-group">
+                                        <label>Full Name</label>
+                                        <input type="text" value="Admin User">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Email Address</label>
+                                        <input type="email" value="admin@blocksmiths.com">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Role</label>
+                                        <input type="text" value="Super Admin" disabled>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Password</label>
+                                        <input type="password">
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="primary-btn">Save Changes</button>
+                                        <button type="reset" class="secondary-btn">Reset</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Security Settings Panel -->
+                        <div id="security-settings" class="settings-panel">
+                            <h2>Security Settings</h2>
+                            
+                            <div class="security-settings">
+                                <div class="security-status">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div class="security-info">
+                                        <h4>Your account is secure</h4>
+                                        <p>Last security check: Today at 10:30 AM</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="two-factor-auth">
+                                    <div class="form-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <h4>Two-Factor Authentication</h4>
+                                                <p>Add an extra layer of security to your account</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="enable-2fa">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="qr-container" style="display: none;">
+                                            <div class="qr-code">
+                                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=otpauth://totp/Blocksmiths:admin@blocksmiths.com?secret=JBSWY3DPEHPK3PXP&issuer=Blocksmiths" alt="QR Code">
+                                            </div>
+                                            <p class="qr-instructions">Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.) and enter the 6-digit code below to enable 2FA.</p>
+                                            <div class="verification-input">
+                                                <input type="text" placeholder="Enter 6-digit code" maxlength="6">
+                                                <button>Verify</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="password-security">
+                                    <h4>Password Security</h4>
+                                    <div class="form-group">
+                                        <label>Current Password</label>
+                                        <input type="password" placeholder="Enter your current password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>New Password</label>
+                                        <input type="password" id="new-password" placeholder="Enter new password">
+                                        <div class="password-strength">
+                                            <div class="strength-meter">
+                                                <div class="strength-bar" style="width: 0%"></div>
+                                            </div>
+                                            <span class="strength-text">Password strength</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Confirm New Password</label>
+                                        <input type="password" placeholder="Confirm new password">
+                                    </div>
+                                    <div class="password-requirements">
+                                        <p>Password must:</p>
+                                        <ul>
+                                            <li class="requirement" id="req-length"><i class="fas fa-times-circle"></i> Be at least 8 characters long</li>
+                                            <li class="requirement" id="req-uppercase"><i class="fas fa-times-circle"></i> Include at least one uppercase letter</li>
+                                            <li class="requirement" id="req-lowercase"><i class="fas fa-times-circle"></i> Include at least one lowercase letter</li>
+                                            <li class="requirement" id="req-number"><i class="fas fa-times-circle"></i> Include at least one number</li>
+                                            <li class="requirement" id="req-special"><i class="fas fa-times-circle"></i> Include at least one special character</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="session-list">
+                                    <h4>Active Sessions</h4>
+                                    <div class="session-item">
+                                        <div class="session-info">
+                                            <div class="session-icon">
+                                                <i class="fas fa-laptop"></i>
+                                            </div>
+                                            <div class="session-details">
+                                                <h4>Current Session</h4>
+                                                <p>Windows 10 · Chrome · New York, USA</p>
+                                            </div>
+                                        </div>
+                                        <div class="session-actions">
+                                            <span class="active-badge">Active now</span>
+                                        </div>
+                                    </div>
+                                    <div class="session-item">
+                                        <div class="session-info">
+                                            <div class="session-icon">
+                                                <i class="fas fa-mobile-alt"></i>
+                                            </div>
+                                            <div class="session-details">
+                                                <h4>Mobile App</h4>
+                                                <p>iOS 15 · Blocksmiths App · San Francisco, USA</p>
+                                            </div>
+                                        </div>
+                                        <div class="session-actions">
+                                            <span>2 hours ago</span>
+                                            <button class="revoke-btn">Revoke</button>
+                                        </div>
+                                    </div>
+                                    <div class="session-item">
+                                        <div class="session-info">
+                                            <div class="session-icon">
+                                                <i class="fas fa-tablet-alt"></i>
+                                            </div>
+                                            <div class="session-details">
+                                                <h4>Tablet</h4>
+                                                <p>iPadOS · Safari · Boston, USA</p>
+                                            </div>
+                                        </div>
+                                        <div class="session-actions">
+                                            <span>Yesterday</span>
+                                            <button class="revoke-btn">Revoke</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="login-history">
+                                    <div class="section-header">
+                                        <h4>Login History</h4>
+                                        <a href="#" class="view-all">View All</a>
+                                    </div>
+                                    <div class="table-container">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date & Time</th>
+                                                    <th>Device</th>
+                                                    <th>Location</th>
+                                                    <th>IP Address</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Today, 10:30 AM</td>
+                                                    <td>Chrome on Windows</td>
+                                                    <td>New York, USA</td>
+                                                    <td>192.168.1.1</td>
+                                                    <td><span class="status active">Successful</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Yesterday, 3:45 PM</td>
+                                                    <td>Safari on iPad</td>
+                                                    <td>Boston, USA</td>
+                                                    <td>192.168.2.2</td>
+                                                    <td><span class="status active">Successful</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jun 15, 2023, 8:20 AM</td>
+                                                    <td>Firefox on Mac</td>
+                                                    <td>Chicago, USA</td>
+                                                    <td>192.168.3.3</td>
+                                                    <td><span class="status inactive">Failed</span></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <div class="security-actions">
+                                    <div class="action-card">
+                                        <div class="action-icon">
+                                            <i class="fas fa-lock"></i>
+                                        </div>
+                                        <div class="action-details">
+                                            <h4>Account Recovery</h4>
+                                            <p>Set up recovery options for your account</p>
+                                            <button class="action-btn">Configure</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="action-card">
+                                        <div class="action-icon">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="action-details">
+                                            <h4>Email Verification</h4>
+                                            <p>Verify your email address for account security</p>
+                                            <button class="action-btn">Verify Email</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="action-card">
+                                        <div class="action-icon">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div class="action-details">
+                                            <h4>Security Alerts</h4>
+                                            <p>Get notified about suspicious activities</p>
+                                            <button class="action-btn">Configure Alerts</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="button" class="primary-btn">Save Changes</button>
+                                    <button type="button" class="danger-btn">Revoke All Sessions</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notification Settings Panel -->
+                        <div id="notification-settings" class="settings-panel">
+                            <h2>Notification Settings</h2>
+                            
+                            <form class="settings-form">
+                                <div class="notification-group">
+                                    <h4>Email Notifications</h4>
+                                    
+                                    <div class="form-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <label>Security Alerts</label>
+                                                <p class="setting-description">Receive emails about suspicious login attempts and security updates</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <label>New User Registrations</label>
+                                                <p class="setting-description">Get notified when new users register on the platform</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <label>Contract Deployments</label>
+                                                <p>Receive notifications when new contracts are deployed</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="notification-group">
+                                    <h4>In-App Notifications</h4>
+                                    
+                                    <div class="form-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <label>Project Updates</label>
+                                                <p>Get notified about project status changes and updates</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <label>System Announcements</label>
+                                                <p>Important announcements about the platform</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <label>Analytics Reports</label>
+                                                <p>Weekly and monthly analytics reports</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="primary-btn">Save Changes</button>
+                                    <button type="button" class="secondary-btn">Reset to Default</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- API Keys Panel -->
+                        <div id="api-settings" class="settings-panel">
+                            <h2>API Keys</h2>
+                            
+                            <p class="setting-description">Manage API keys for accessing the Blocksmiths API. Keep your keys secure and never share them publicly.</p>
+                            
+                            <button class="generate-key-btn"><i class="fas fa-plus"></i> Generate New API Key</button>
+                            
+                            <div class="api-key-container">
+                                <div class="api-key-item">
+                                    <div class="api-key-header">
+                                        <span class="api-key-name">Production API Key</span>
+                                        <div class="api-key-actions">
+                                            <button class="api-key-regenerate" data-tooltip="Regenerate Key"><i class="fas fa-sync-alt"></i></button>
+                                            <button class="api-key-delete" data-tooltip="Delete Key"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="api-key-value">
+                                        <span class="api-key-mask masked">••••••••••••••••••••••••••••••</span>
+                                        <button class="api-key-show"><i class="fas fa-eye"></i></button>
+                                    </div>
+                                    <div class="api-key-info">
+                                        <span>Created: May 15, 2023</span>
+                                        <span>Last used: 2 hours ago</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="api-key-item">
+                                    <div class="api-key-header">
+                                        <span class="api-key-name">Development API Key</span>
+                                        <div class="api-key-actions">
+                                            <button class="api-key-regenerate" data-tooltip="Regenerate Key"><i class="fas fa-sync-alt"></i></button>
+                                            <button class="api-key-delete" data-tooltip="Delete Key"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="api-key-value">
+                                        <span class="api-key-mask masked">••••••••••••••••••••••••••••••</span>
+                                        <button class="api-key-show"><i class="fas fa-eye"></i></button>
+                                    </div>
+                                    <div class="api-key-info">
+                                        <span>Created: June 10, 2023</span>
+                                        <span>Last used: Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Blockchain Settings Panel -->
+                        <div id="blockchain-settings" class="settings-panel">
+                            <h2>Blockchain Settings</h2>
+                            
+                            <div class="blockchain-settings">
+                                <h4>Network Connections</h4>
+                                
+                                <div class="network-card" data-network="ethereum">
+                                    <div class="network-info">
+                                        <div class="network-icon ethereum">
+                                            <i class="fab fa-ethereum"></i>
+                                        </div>
+                                        <div class="network-details">
+                                            <h4>Ethereum Mainnet</h4>
+                                            <p>https://mainnet.infura.io/v3/your-api-key</p>
+                                        </div>
+                                    </div>
+                                    <div class="network-status">
+                                        <span class="status-indicator connected"></span>
+                                        <span class="status-text">Connected</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked data-network="ethereum" class="network-toggle">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="network-card" data-network="polygon">
+                                    <div class="network-info">
+                                        <div class="network-icon polygon">
+                                            <i class="fas fa-project-diagram"></i>
+                                        </div>
+                                        <div class="network-details">
+                                            <h4>Polygon Mainnet</h4>
+                                            <p>https://polygon-rpc.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="network-status">
+                                        <span class="status-indicator connected"></span>
+                                        <span class="status-text">Connected</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked data-network="polygon" class="network-toggle">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="network-card" data-network="binance">
+                                    <div class="network-info">
+                                        <div class="network-icon binance">
+                                            <i class="fas fa-coins"></i>
+                                        </div>
+                                        <div class="network-details">
+                                            <h4>Binance Smart Chain</h4>
+                                            <p>https://bsc-dataseed.binance.org</p>
+                                        </div>
+                                    </div>
+                                    <div class="network-status">
+                                        <span class="status-indicator disconnected"></span>
+                                        <span class="status-text">Disconnected</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" data-network="binance" class="network-toggle">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="network-card" data-network="solana">
+                                    <div class="network-info">
+                                        <div class="network-icon solana">
+                                            <i class="fas fa-sun"></i>
+                                        </div>
+                                        <div class="network-details">
+                                            <h4>Solana Mainnet</h4>
+                                            <p>https://api.mainnet-beta.solana.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="network-status">
+                                        <span class="status-indicator disconnected"></span>
+                                        <span class="status-text">Disconnected</span>
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" data-network="solana" class="network-toggle">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="gas-price-container">
+                                    <div class="gas-price-header">
+                                        <h3>Current Gas Prices (Ethereum)</h3>
+                                        <button class="refresh-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
+                                    </div>
+                                    
+                                    <div class="gas-price-grid">
+                                        <div class="gas-price-card">
+                                            <h4>Slow</h4>
+                                            <div class="gas-price-value" id="slow-gas-price">25</div>
+                                            <div class="gas-price-unit">GWEI</div>
+                                        </div>
+                                        
+                                        <div class="gas-price-card">
+                                            <h4>Average</h4>
+                                            <div class="gas-price-value" id="average-gas-price">45</div>
+                                            <div class="gas-price-unit">GWEI</div>
+                                        </div>
+                                        
+                                        <div class="gas-price-card">
+                                            <h4>Fast</h4>
+                                            <div class="gas-price-value" id="fast-gas-price">65</div>
+                                            <div class="gas-price-unit">GWEI</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions" style="margin-top: 20px;">
+                                    <button type="button" class="primary-btn">Save Changes</button>
+                                    <button type="button" class="secondary-btn">Reset Connections</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/documents.js"></script>
+    <script src="js/contracts.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="superuser.js"></script>
+</body>
+</html>

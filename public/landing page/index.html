@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blocksmiths - Web3 Development</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <div class="nav-content container">
+            <div class="logo">Blocksmiths</div>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="../login/login.html" class="login-btn"><i class="fas fa-user"></i> Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="content">
+        <section id="home" class="hero">
+            <div class="hero-content container">
+                <h1 data-aos="fade-up">Welcome to Blocksmiths</h1>
+                <p data-aos="fade-up" data-aos-delay="200">Building the Future of Web3</p>
+                <button class="cta-button" data-aos="fade-up" data-aos-delay="400">
+                    <a href="#services">Get Started</a>
+                </button>
+            </div>
+            <div class="hero-background"></div>
+        </section>
+
+        <section id="services" class="services">
+            <div class="container">
+                <h2 data-aos="fade-up" style="color: white;">Our Services</h2>
+                <div class="services-grid">
+                    <div class="service-card" data-aos="flip-left">
+                        <i class="fas fa-code"></i>
+                        <h3>Smart Contract Development</h3>
+                        <p>Secure and efficient blockchain solutions</p>
+                    </div>
+                    <div class="service-card" data-aos="flip-left" data-aos-delay="200">
+                        <i class="fas fa-cubes"></i>
+                        <h3>DApp Development</h3>
+                        <p>Full-stack decentralized applications</p>
+                    </div>
+                    <div class="service-card" data-aos="flip-left" data-aos-delay="400">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Security Audits</h3>
+                        <p>Comprehensive smart contract auditing</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="about-content container">
+                <div class="about-text" data-aos="fade-right">
+                    <h2 style="color: white;">About Us</h2>
+                    <p>We are a team of passionate blockchain developers dedicated to building the next generation of decentralized applications. Our expertise spans across multiple blockchain platforms and technologies.</p>
+                </div>
+                <div class="about-image" data-aos="fade-left">
+                    <div class="floating-cube"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <div class="container">
+                <h2 data-aos="fade-up" style="color: white;">Get in Touch</h2>
+                <div class="contact-form" data-aos="fade-up" data-aos-delay="200">
+                    <input type="email" placeholder="Your Email">
+                    <textarea placeholder="Your Message"></textarea>
+                    <button class="submit-button">Send Message</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Blocksmiths</div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Blocksmiths. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="../login/login.html">User Login</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

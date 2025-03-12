@@ -1,0 +1,233 @@
+/* From Uiverse.io by mi-series */ 
+body {
+  background-color: #171f2e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  width: 100%;
+  max-width: 500px; /* Increased max-width for larger container */
+}
+
+.form_area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: #374151;
+  height: auto;
+  width: 100%;
+  padding: 30px 20px; /* Added padding for more space inside */
+  border: 2px solid #264143;
+  border-radius: 20px;
+  box-shadow: 3px 4px 0px 1px #3b82f6;
+}
+
+.title {
+  color: white;
+  font-weight: 900;
+  font-size: 2em; /* Increased font size */
+  margin-top: 20px;
+  margin-bottom: 20px; /* Added bottom margin */
+}
+
+.sub_title {
+  color: white;
+  font-weight: 600;
+  margin: 5px 0;
+}
+
+.form_group {
+  display: flex;
+  flex-direction: column;
+  align-items: baseline;
+  margin: 15px 0; /* Increased margin */
+  width: 90%; /* Reduced from 100% to create some margin */
+}
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form_style {
+  outline: none;
+  border: 2px solid #264143;
+  box-shadow: 3px 4px 0px 1px #3b82f6;
+  width: 100%;
+  padding: 15px; /* Increased padding */
+  border-radius: 4px;
+  font-size: 16px; /* Increased font size */
+  box-sizing: border-box;
+  background-color: #1f2937; /* Darker background for input */
+  color: white;
+}
+
+.form_style::placeholder {
+  color: #9ca3af; /* Lighter color for placeholder text */
+}
+
+.form_style:focus, .btn:focus {
+  transform: translateY(4px);
+  box-shadow: 1px 2px 0px 0px #3b82f6;
+}
+
+.btn {
+  padding: 18px; /* Increased padding */
+  margin: 30px 0px; /* Increased margin */
+  width: 90%; /* Match the width of form_group */
+  font-size: 18px; /* Increased font size */
+  background: #3b82f6;
+  border-radius: 10px;
+  font-weight: 800;
+  box-shadow: 3px 3px 0px 0px white;
+  cursor: pointer;
+  color: white;
+  border: none;
+}
+
+.btn:hover {
+  opacity: .9;
+}
+
+.link {
+  font-weight: 800;
+  color: #3b82f6;
+  padding: 5px;
+  text-decoration: none;
+}
+
+/* Text color for paragraph */
+p {
+  color: white;
+}
+
+/* Styles for validation error messages */
+.error-message {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin-top: 5px;
+  text-align: left;
+  width: 100%;
+}
+
+input.error {
+  border-color: #ff6b6b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .form_area {
+    border-radius: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 5px;
+  }
+  
+  .form_area {
+    padding: 15px 10px;
+    border-radius: 10px;
+  }
+  
+  .form_group {
+    width: 95%;
+  }
+  
+  .btn {
+    width: 95%;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  .btn:hover {
+    opacity: 1;
+    transform: none;
+    box-shadow: 3px 3px 0px 0px white;
+  }
+  
+  .btn:active {
+    opacity: .9;
+    transform: translateY(2px);
+    box-shadow: 2px 2px 0px 0px white;
+  }
+}
+
+/* High DPI Screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .form_area {
+    border-width: 1px;
+  }
+  
+  .form_style {
+    border-width: 1px;
+  }
+}
+
+/* Landscape Mode */
+@media (max-height: 600px) and (orientation: landscape) {
+  .container {
+    padding: 10px;
+  }
+  
+  .form_area {
+    padding: 15px;
+  }
+  
+  .title {
+    margin: 10px 0;
+  }
+  
+  .form_group {
+    margin: 8px 0;
+  }
+  
+  .btn {
+    margin: 15px 0;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+  }
+  
+  .form_area {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+  
+  .btn {
+    display: none;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .form_style:focus,
+  .btn:focus,
+  .btn:hover,
+  .btn:active {
+    transform: none;
+  }
+}

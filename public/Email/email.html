@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Authentication</title>
+    <!-- Load EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link rel="stylesheet" href="email.css">
+    <style>
+        .form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .otpverify {
+            display: none;
+            margin-top: 20px;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            color: #007bff;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="form">
+        <h1 style="color: white;">OTP Authentication</h1>
+        <input type="email" id="email" placeholder="Enter your email...">
+        <button class="btn" id="send-btn">Send OTP</button>
+        <div id="loading">Sending OTP...</div>
+        
+        <div class="otpverify">
+            <input type="text" id="otp_inp" placeholder="Enter OTP...">
+            <button class="btn" id="otp-btn">Verify OTP</button>
+        </div>
+    </div>
+    <script>
+        // Check if EmailJS is loaded
+        window.onload = function() {
+            if (typeof emailjs === 'undefined') {
+                alert('Warning: EmailJS failed to load. Please check your internet connection.');
+            }
+        }
+    </script>
+    <script src="email.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Blocksmiths</title>
+    <link rel="stylesheet" href="loginstyle.css">
+    <script src="admin-login.js" defer></script>
+    <style>
+        /* Additional styles for admin login */
+        .admin-badge {
+            background-color: #3b82f6;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        
+        .security-notice {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form_area">
+            <span class="admin-badge">ADMIN AREA</span>
+            <p class="title">Admin Login</p>
+            <form>
+                <div class="form_group">
+                    <label class="sub_title" for="email">Email</label>
+                    <input placeholder="Enter your admin email" id="email" class="form_style" type="email">
+                </div>
+                <div class="form_group">
+                    <label class="sub_title" for="password">Password</label>
+                    <input placeholder="Enter your password" id="password" class="form_style" type="password">
+                </div>
+                <div>
+                    <button class="btn">LOGIN</button>
+                    <p>Return to <a class="link" href="..\landing page\index.html">Homepage</a></p>
+                </div>
+            </form>
+            
+            <p class="security-notice">
+                This area is restricted to authorized administrators only. 
+                All login attempts are logged and monitored.
+            </p>
+        </div>
+    </div>
+</body>
+</html> 
