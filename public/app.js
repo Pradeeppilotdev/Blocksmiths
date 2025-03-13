@@ -5,6 +5,7 @@ let signer = null;
 let contract = null;
 const selectedFiles = {};
 const verifiedPANs = {}; // Track which PANs have been verified
+const uploadedDocuments = new Map();
 
 // Mock PAN data for verification
 const mockPANDatabase = {
@@ -513,6 +514,7 @@ window.addEventListener('load', async () => {
                 enableAllServiceInteractions();
             }
         }
+        updateDocumentsTable();
     } catch (error) {
         console.error('Initialization error:', error);
         disableAllServiceInteractions();
@@ -659,6 +661,17 @@ function handleFileSelect(event, service) {
             payButton.classList.remove('opacity-50', 'cursor-not-allowed');
             payButton.classList.add('payment-ready');
         }
+
+        // Add to uploaded documents with pending status
+        uploadedDocuments.set(service, {
+            fileName: file.name,
+            status: 'Pending',
+            ipfsHash: null,
+            transactionHash: null
+        });
+        
+        // Update the documents table
+        updateDocumentsTable();
     } else {
         fileInfo.textContent = '';
         delete selectedFiles[service];
@@ -782,6 +795,17 @@ async function handlePayment(service) {
             // Disable payment button again
             payButton.classList.add('opacity-50', 'cursor-not-allowed');
 
+            // After successful payment and IPFS upload, update the document status
+            uploadedDocuments.set(service, {
+                fileName: selectedFiles[service].name,
+                status: 'Verified',
+                ipfsHash: ipfsHash,
+                transactionHash: tx.hash
+            });
+            
+            // Update the documents table
+            updateDocumentsTable();
+
         } catch (error) {
             throw new Error('Transaction failed: ' + error.message);
         }
@@ -834,5 +858,74 @@ function revealOnScroll() {
         if (elementTop < window.innerHeight - elementVisible) {
             element.classList.add('active');
         }
+    });
+}
+
+// Add this function to handle logout
+function handleLogout() {
+    // Disconnect wallet if connected
+    if (userWalletAddress) {
+        disconnectWallet();
+    }
+    
+    // Show loading state
+    const logoutButton = document.querySelector('button[onclick="handleLogout()"]');
+    const originalContent = logoutButton.innerHTML;
+    logoutButton.innerHTML = '<span class="animate-spin">↻</span> Logging out...';
+    
+    // Simulate a brief delay for better UX
+    setTimeout(() => {
+        // Redirect to index.html
+        window.location.href = 'index.html';
+    }, 1000);
+}
+
+// Add this new function to update the documents table
+function updateDocumentsTable() {
+    const tableBody = document.getElementById('documentStatusTable');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (uploadedDocuments.size === 0) {
+        tableBody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+    }
+    
+    emptyState.classList.add('hidden');
+    tableBody.innerHTML = '';
+    
+    uploadedDocuments.forEach((doc, service) => {
+        const row = document.createElement('tr');
+        row.className = 'border-t border-gray-800';
+        
+        const statusClass = doc.status === 'Verified' 
+            ? 'text-green-400' 
+            : 'text-yellow-400';
+        
+        row.innerHTML = `
+            <td class="px-6 py-4 text-sm text-gray-300">${service}</td>
+            <td class="px-6 py-4 text-sm text-gray-300">${doc.fileName}</td>
+            <td class="px-6 py-4 text-sm ${statusClass}">${doc.status}</td>
+            <td class="px-6 py-4 text-sm text-gray-300">
+                ${doc.ipfsHash 
+                    ? `<a href="https://gateway.pinata.cloud/ipfs/${doc.ipfsHash}" 
+                         target="_blank" 
+                         class="text-blue-400 hover:underline">
+                         ${doc.ipfsHash.substring(0, 6)}...${doc.ipfsHash.substring(doc.ipfsHash.length - 4)}
+                       </a>`
+                    : '-'}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-300">
+                ${doc.transactionHash 
+                    ? `<a href="https://sepolia.etherscan.io/tx/${doc.transactionHash}" 
+                         target="_blank" 
+                         class="text-blue-400 hover:underline">
+                         ${doc.transactionHash.substring(0, 6)}...${doc.transactionHash.substring(doc.transactionHash.length - 4)}
+                       </a>`
+                    : '-'}
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
     });
 }
