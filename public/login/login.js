@@ -50,14 +50,23 @@ document.addEventListener('DOMContentLoaded', function() {
     function attemptLogin(email, password) {
         // This is where you would make an API call to your server
         console.log('Attempting login with:', email);
-        
+       
         // Simulating a login process
         setTimeout(() => {
+            if(email === username && password === userpassword){
+
             // For demonstration purposes only
             alert('Login successful! Redirecting...');
+            showMessage('Login successful! Redirecting to home page', 'success', loginButton, loginForm);
             // Redirect to dashboard or home page after successful login
             window.location.href = '../home.html';
+            }
+            else{
+                alert('user name or password might be wrong');
+                showMessage('username or password incorrect', 'error', loginButton, loginForm);
+            }
         }, 1000);
+    
         
         // In a real application, you would use fetch or axios:
         /*
@@ -84,71 +93,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Admin Login Function
-document.addEventListener('DOMContentLoaded', function() {
-    // Get form elements
-    const loginForm = document.querySelector('form');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const loginButton = document.querySelector('.btn');
-
-    // Admin credentials (in a real application, these would be verified against a database)
-    const ADMIN_EMAIL = "admin@blocksmiths.com";
-    const ADMIN_PASSWORD = "Admin@123";
-
-    // Form submission handler
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        
-        // Call the admin login function
-        adminLogin(emailInput.value, passwordInput.value);
-    });
-
-    // Admin login function
-    function adminLogin(email, password) {
-        // Show loading state
-        loginButton.textContent = 'Authenticating...';
-        loginButton.disabled = true;
-        
-        // Simulate server delay (remove in production)
-        setTimeout(() => {
-            // Check if credentials match
-            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                // Login successful
-                
-                // Store admin session in localStorage
-                localStorage.setItem('adminLoggedIn', 'true');
-                localStorage.setItem('adminEmail', email);
-                localStorage.setItem('adminLoginTime', new Date().toISOString());
-                
-                // Show success message
-                showMessage('Login successful! Redirecting to admin dashboard...', 'success');
-                
-                // Redirect to superuser dashboard
-                setTimeout(() => {
-                    window.location.href = '../admin/superuser.html';
-                }, 1500);
-            } else {
-                // Login failed
-                showMessage('Invalid admin credentials. Redirecting to home page...', 'error');
-                
-                // Reset button state
-                loginButton.textContent = 'LOGIN';
-                loginButton.disabled = false;
-                
-                // Clear password field
-                passwordInput.value = '';
-                
-                // Redirect to Home.html after showing error message
-                setTimeout(() => {
-                    window.location.href = '../home/Home.html';
-                }, 2000);
-            }
-        }, 1000);
-    }
 
     // Function to show message (success or error)
-    function showMessage(message, type) {
+    function showMessage(message, type, loginButton, loginForm) {
         // Remove any existing messages
         const existingMessage = document.querySelector('.message');
         if (existingMessage) {
@@ -186,4 +133,3 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check for existing login on page load
    // checkExistingLogin();
-}); 
