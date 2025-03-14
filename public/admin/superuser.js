@@ -210,34 +210,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Settings navigation
-    const settingsNavLinks = document.querySelectorAll('.settings-nav a');
-    const settingsPanels = document.querySelectorAll('.settings-panel');
-    
-    settingsNavLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Remove active class from all links
-            settingsNavLinks.forEach(link => {
-                link.parentElement.classList.remove('active');
-            });
-            
-            // Add active class to clicked link
-            this.parentElement.classList.add('active');
-            
-            // Show corresponding panel
-            const targetId = this.getAttribute('href').substring(1);
-            settingsPanels.forEach(panel => {
-                panel.classList.remove('active');
-                if (panel.id === targetId) {
-                    panel.classList.add('active');
-                }
-            });
-        });
-    });
-    
-    // Contract tabs
+
+ /*    // Contract tabs
     const contractTabs = document.querySelectorAll('.contract-tabs .tab-btn');
     const contractContents = document.querySelectorAll('.contract-content');
     
@@ -258,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-    });
+    }); */
     
     // Copy contract address
     const copyButtons = document.querySelectorAll('.copy-btn');
