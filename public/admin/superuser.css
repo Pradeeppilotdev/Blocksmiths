@@ -1372,3 +1372,48 @@ body {
         margin-bottom: 0.5rem;
     }
 }
+
+/* Add these styles for the documents section */
+.documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.document-card {
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.document-card:hover {
+    transform: translateY(-2px);
+}
+
+.document-status.pending-review {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.document-status.approved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.document-status.rejected {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.refresh-btn {
+    margin: 1rem;
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    background-color: #3b82f6;
+}
+
+/* Add more styles as needed */

@@ -685,7 +685,7 @@ function handleFileSelect(event, service) {
 
 // Payment handling
 async function handlePayment(service) {
-    let originalText = 'Pay Now'; // Default text
+    let originalText = 'Pay Now';
     const payButton = document.getElementById(`payButton-${service}`);
     
     try {
@@ -706,105 +706,77 @@ async function handlePayment(service) {
         payButton.innerHTML = '<span class="animate-spin">↻</span> Processing Payment...';
         payButton.disabled = true;
 
-        if (!contract) {
-            await initBlockchain();
-        }
-
-        if (!contract) {
-            throw new Error('Contract not initialized');
-        }
-
-        // Get PAN details for metadata
-        const panData = mockPANDatabase[verifiedPANs[service]];
-
         try {
             // Process payment first
             console.log('Making payment for service:', service);
             
-            // Use ethers.parseEther instead of ethers.utils.parseEther
             const tx = await contract.makePayment(
                 service,
-                "pending", // Temporary hash until file is uploaded
+                "pending",
                 {
-                    value: ethers.parseEther('0.001'),  // Updated for ethers v6
+                    value: ethers.parseEther('0.001'),
                     gasLimit: 300000
                 }
             );
 
             console.log('Transaction sent:', tx.hash);
-            payButton.innerHTML = '<span class="animate-spin">↻</span> Confirming Payment...';
-            
             const receipt = await tx.wait();
             console.log('Transaction confirmed:', receipt);
 
-            // Now upload to IPFS after payment confirmation
-            payButton.innerHTML = '<span class="animate-spin">↻</span> Uploading to IPFS...';
-
-            // Upload to Pinata
-            const formData = new FormData();
-            formData.append('file', selectedFiles[service]);
+            // Get PAN details
+            const panData = mockPANDatabase[verifiedPANs[service]];
             
-            // Add metadata with PAN details
-            const metadata = JSON.stringify({
-                name: `${service} Certificate`,
-                description: `${service} payment certificate for ${panData.name}`,
-                pan: verifiedPANs[service],
+            // Convert file to base64
+            const fileData = await fileToBase64(selectedFiles[service]);
+            console.log('File converted to base64');
+
+            // Create document data object
+            const documentData = {
+                id: Date.now().toString(),
+                fileName: selectedFiles[service].name,
+                fileData: fileData,
+                status: 'Pending Review',
+                panData: panData,
+                service: service,
+                transactionHash: tx.hash,
                 timestamp: new Date().toISOString(),
-                transactionHash: tx.hash
-            });
-            formData.append('pinataMetadata', metadata);
+                walletAddress: userWalletAddress
+            };
 
-            const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'pinata_api_key': 'f06e5fd1f9bd46842319',
-                    'pinata_secret_api_key': '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
-                }
-            });
+            console.log('Document data created:', documentData);
 
-            const ipfsHash = response.data.IpfsHash;
-            console.log('File uploaded to IPFS:', ipfsHash);
+            // Get existing documents from localStorage
+            let existingDocs = [];
+            try {
+                existingDocs = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+            } catch (e) {
+                console.error('Error parsing existing documents:', e);
+            }
 
-            // Show success message with PAN details and transaction info
+            // Add new document
+            existingDocs.push(documentData);
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('adminDocuments', JSON.stringify(existingDocs));
+                console.log('Document saved to localStorage. Total documents:', existingDocs.length);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+
+            // Show success message
             showSuccess(`
                 <h3 class="text-xl font-bold mb-4">Payment Successful!</h3>
-                <p class="mb-4">Your payment for ${service} has been processed.</p>
+                <p class="mb-4">Your document has been submitted for review.</p>
                 <div class="bg-gray-800 p-4 rounded-lg mb-4 text-left">
                     <p><span class="text-gray-400">Name:</span> ${panData.name}</p>
-                    <p><span class="text-gray-400">PAN:</span> ${verifiedPANs[service]}</p>
                     <p><span class="text-gray-400">Service:</span> ${service}</p>
                     <p><span class="text-gray-400">Transaction:</span> <a href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank" class="text-blue-400 hover:underline">View Transaction</a></p>
-                    <p><span class="text-gray-400">Certificate:</span> <a href="https://gateway.pinata.cloud/ipfs/${ipfsHash}" target="_blank" class="text-blue-400 hover:underline">View Certificate</a></p>
                 </div>
             `);
             
             // Reset UI
-            payButton.innerHTML = `<span class="payment-text">${originalText}</span>`;
-            payButton.disabled = false;
-            delete selectedFiles[service];
-            document.getElementById(`certificateFile-${service}`).value = '';
-            document.getElementById(`fileInfo-${service}`).textContent = '';
-            
-            // Reset PAN verification UI but keep the PAN verified
-            document.getElementById(`panVerificationResult-${service}`).classList.add('hidden');
-            
-            // Disable file upload again
-            document.getElementById(`certificateFile-${service}`).disabled = true;
-            document.getElementById(`fileUploadButton-${service}`).classList.add('opacity-50', 'cursor-not-allowed');
-            
-            // Disable payment button again
-            payButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-            // After successful payment and IPFS upload, update the document status
-            uploadedDocuments.set(service, {
-                fileName: selectedFiles[service].name,
-                status: 'Verified',
-                ipfsHash: ipfsHash,
-                transactionHash: tx.hash
-            });
-            
-            // Update the documents table
-            updateDocumentsTable();
+            resetUIAfterPayment(service, originalText);
 
         } catch (error) {
             throw new Error('Transaction failed: ' + error.message);
@@ -813,11 +785,33 @@ async function handlePayment(service) {
     } catch (error) {
         console.error('Payment error:', error);
         showError(error.message);
-        
-        // Reset button state
         payButton.innerHTML = `<span class="payment-text">${originalText}</span>`;
         payButton.disabled = false;
     }
+}
+
+// Helper function to reset UI after payment
+function resetUIAfterPayment(service, originalText) {
+    const payButton = document.getElementById(`payButton-${service}`);
+    payButton.innerHTML = `<span class="payment-text">${originalText}</span>`;
+    payButton.disabled = false;
+    delete selectedFiles[service];
+    document.getElementById(`certificateFile-${service}`).value = '';
+    document.getElementById(`fileInfo-${service}`).textContent = '';
+    document.getElementById(`panVerificationResult-${service}`).classList.add('hidden');
+    document.getElementById(`certificateFile-${service}`).disabled = true;
+    document.getElementById(`fileUploadButton-${service}`).classList.add('opacity-50', 'cursor-not-allowed');
+    payButton.classList.add('opacity-50', 'cursor-not-allowed');
+}
+
+// Helper function to convert file to base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 }
 
 function showSuccess(message) {
@@ -879,7 +873,6 @@ function handleLogout() {
         window.location.href = 'index.html';
     }, 1000);
 }
-
 // Add this new function to update the documents table
 function updateDocumentsTable() {
     const tableBody = document.getElementById('documentStatusTable');
@@ -906,15 +899,6 @@ function updateDocumentsTable() {
             <td class="px-6 py-4 text-sm text-gray-300">${service}</td>
             <td class="px-6 py-4 text-sm text-gray-300">${doc.fileName}</td>
             <td class="px-6 py-4 text-sm ${statusClass}">${doc.status}</td>
-            <td class="px-6 py-4 text-sm text-gray-300">
-                ${doc.ipfsHash 
-                    ? `<a href="https://gateway.pinata.cloud/ipfs/${doc.ipfsHash}" 
-                         target="_blank" 
-                         class="text-blue-400 hover:underline">
-                         ${doc.ipfsHash.substring(0, 6)}...${doc.ipfsHash.substring(doc.ipfsHash.length - 4)}
-                       </a>`
-                    : '-'}
-            </td>
             <td class="px-6 py-4 text-sm text-gray-300">
                 ${doc.transactionHash 
                     ? `<a href="https://sepolia.etherscan.io/tx/${doc.transactionHash}" 

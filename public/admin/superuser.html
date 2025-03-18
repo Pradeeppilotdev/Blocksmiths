@@ -394,7 +394,7 @@
 
             <!-- Documents Section -->
             <section id="documents" class="dashboard-section">
-                <h1 style="color: black;">DOCS Management </h1>
+                <h1 style="color: black;">DOCS Management</h1>
                 
                 <div class="section-actions">
                     <div class="search-filter">
@@ -406,69 +406,10 @@
                             <option value="rejected">Rejected</option>
                         </select>
                     </div>
-                    <button class="primary-btn"><i class="fas fa-upload"></i> Upload Document</button>
                 </div>
                 
                 <div class="documents-grid">
-                    <div class="document-card">
-                        <div class="document-header">
-                            <span class="document-status pending">Pending Review</span>
-                            <div class="document-actions">
-                                <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
-                            </div>
-                        </div>
-                        <div class="user-info">
-                            <h3>John Smith</h3>
-                            <p class="user-email">john.smith@example.com</p>
-                            <p class="wallet-address">0x1234...5678</p>
-                        </div>
-                        <div class="document-details">
-                            <div class="meta-item">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>KYC Documents.pdf</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>Uploaded: Jun 15, 2023</span>
-                            </div>
-                        </div>
-                        <div class="document-actions-footer">
-                            <button class="view-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="view-btn ipfs-btn"><i class="fas fa-database"></i> IPFS</button>
-                            <button class="view-btn approve-btn"><i class="fas fa-check"></i> OK</button>
-                            <button class="view-btn reject-btn"><i class="fas fa-times"></i> No</button>
-                        </div>
-                    </div>
-                    
-                    <div class="document-card">
-                        <div class="document-header">
-                            <span class="document-status approved">Approved</span>
-                            <div class="document-actions">
-                                <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
-                            </div>
-                        </div>
-                        <div class="user-info">
-                            <h3>Sarah Johnson</h3>
-                            <p class="user-email">sarah.j@example.com</p>
-                            <p class="wallet-address">0x9876...4321</p>
-                        </div>
-                        <div class="document-details">
-                            <div class="meta-item">
-                                <i class="fas fa-file-image"></i>
-                                <span>Identity Verification.jpg</span>
-                            </div>
-                            <div class="meta-item">
-                                <i class="fas fa-calendar"></i>
-                                <span>Uploaded: Jun 10, 2023</span>
-                            </div>
-                        </div>
-                        <div class="document-actions-footer">
-                            <button class="view-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="view-btn ipfs-btn" ><i class="fas fa-database"></i> IPFS</button>
-                            <button class="view-btn approve-btn active"><i class="fas fa-check"></i> OK</button>
-                            <button class="view-btn reject-btn"><i class="fas fa-times"></i> No</button>
-                        </div>
-                    </div>
+                    <!-- Documents will be dynamically inserted here -->
                 </div>
             </section>
 
@@ -653,6 +594,11 @@
     <script src="js/contracts.js"></script>
     <script src="js/settings.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="superuser.js"></script>
+    <script>
+        // Add this to check if documents are loading
+        console.log('Initial documents:', JSON.parse(localStorage.getItem('adminDocuments') || '[]'));
+    </script>
 </body>
 </html>

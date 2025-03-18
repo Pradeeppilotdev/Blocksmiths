@@ -5,6 +5,31 @@ AOS.init({
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Admin dashboard loaded');
+    initializeAdminDashboard();
+});
+
+function initializeAdminDashboard() {
+    // Set up navigation
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            showSection(targetId);
+        });
+    });
+
+    // Load documents initially
+    loadDocuments();
+
+    // Add refresh button to documents section
+    const documentsSection = document.getElementById('documents');
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'refresh-btn bg-blue-500 text-white px-4 py-2 rounded-lg mb-4';
+    refreshButton.innerHTML = '<i class="fas fa-sync-alt mr-2"></i> Refresh Documents';
+    refreshButton.onclick = loadDocuments;
+    documentsSection.insertBefore(refreshButton, documentsSection.querySelector('.documents-grid'));
+
     // Sidebar navigation
     const navLinks = document.querySelectorAll('.sidebar-nav a');
     const sections = document.querySelectorAll('.dashboard-section');
@@ -135,104 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Simulate chart data update
-    function updateChartData(period) {
-        // Update bar chart
-        const barChart = document.querySelector('.chart-placeholder');
-        if (barChart) {
-            const bars = barChart.querySelectorAll('.bar');
-            
-        bars.forEach(bar => {
-            let height;
-            switch(period) {
-                case 'weekly':
-                    height = Math.floor(Math.random() * 70) + 30; // 30-100%
-                    break;
-                case 'monthly':
-                    height = Math.floor(Math.random() * 60) + 40; // 40-100%
-                    break;
-                case 'yearly':
-                    height = Math.floor(Math.random() * 50) + 50; // 50-100%
-                    break;
-                default:
-                    height = Math.floor(Math.random() * 70) + 30; // 30-100%
-            }
-            
-            // Animate height change
-            bar.style.height = '0%';
-            setTimeout(() => {
-                bar.style.transition = 'height 0.5s ease';
-                bar.style.height = `${height}%`;
-                }, 50);
-            });
-        }
-        
-        // Update analytics charts
-        animateAnalyticsCharts();
-    }
-    
-    // Initialize bar chart
-    function initBarChart() {
-        const barChartPlaceholder = document.querySelector('.bar-chart-placeholder');
-        if (barChartPlaceholder) {
-            barChartPlaceholder.innerHTML = '';
-            
-            // Create 12 bars for months
-            for (let i = 0; i < 12; i++) {
-                const height = Math.floor(Math.random() * 70) + 30; // 30-100%
-                const bar = document.createElement('div');
-                bar.className = 'bar';
-                bar.style.height = '0%';
-                barChartPlaceholder.appendChild(bar);
-                
-                // Animate bars
-                setTimeout(() => {
-                    bar.style.transition = 'height 0.5s ease';
-                    bar.style.height = `${height}%`;
-                }, 50 * i);
-            }
-        }
-    }
-    
-    // Animate analytics charts
-    function animateAnalyticsCharts() {
-        // Initialize bar chart
-        initBarChart();
-        
-        // Animate line chart
-        const lineChart = document.querySelector('.line-chart-placeholder');
-        if (lineChart) {
-            lineChart.style.animation = 'none';
-            setTimeout(() => {
-                lineChart.style.animation = 'wave 3s infinite ease-in-out';
-            }, 10);
-        }
-    }
-    
-
- /*    // Contract tabs
-    const contractTabs = document.querySelectorAll('.contract-tabs .tab-btn');
-    const contractContents = document.querySelectorAll('.contract-content');
-    
-    contractTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // Remove active class from all tabs
-            contractTabs.forEach(tab => tab.classList.remove('active'));
-            
-            // Add active class to clicked tab
-            this.classList.add('active');
-            
-            // Show corresponding content
-            const tabIndex = Array.from(contractTabs).indexOf(this);
-            contractContents.forEach((content, index) => {
-                content.classList.remove('active');
-                if (index === tabIndex) {
-                    content.classList.add('active');
-                }
-            });
-        });
-    }); */
     
     // Copy contract address
     const copyButtons = document.querySelectorAll('.copy-btn');
@@ -580,7 +507,164 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-});
+
+    loadDocuments();
+}
+
+function showSection(sectionId) {
+    document.querySelectorAll('.dashboard-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(sectionId).classList.add('active');
+}
+
+function loadDocuments() {
+    console.log('Loading documents...');
+    const documentsGrid = document.querySelector('.documents-grid');
+    let documents = [];
+    
+    try {
+        documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+        console.log('Documents loaded from localStorage:', documents);
+    } catch (e) {
+        console.error('Error loading documents:', e);
+    }
+    
+    if (!documents || documents.length === 0) {
+        documentsGrid.innerHTML = `
+            <div class="text-center py-12">
+                <i class="fas fa-folder-open text-4xl mb-4 text-gray-400"></i>
+                <p class="text-gray-500">No documents uploaded yet</p>
+            </div>
+        `;
+        return;
+    }
+    
+    documentsGrid.innerHTML = '';
+    documents.forEach((doc, index) => {
+        const card = createDocumentCard(doc, index);
+        documentsGrid.appendChild(card);
+    });
+}
+
+function createDocumentCard(doc, index) {
+    console.log('Creating card for document:', doc);
+    const card = document.createElement('div');
+    card.className = 'document-card bg-white rounded-lg shadow-md p-4 mb-4';
+    card.innerHTML = `
+        <div class="document-header border-b pb-3 mb-3">
+            <span class="document-status ${doc.status.toLowerCase().replace(' ', '-')} px-3 py-1 rounded-full text-sm">
+                ${doc.status}
+            </span>
+        </div>
+        <div class="user-info mb-4">
+            <h3 class="text-lg font-semibold">${doc.panData.name}</h3>
+            <p class="text-sm text-gray-600">DOB: ${doc.panData.dob}</p>
+            <p class="text-sm text-gray-600">Service: ${doc.service}</p>
+            <p class="text-sm text-gray-600">Wallet: ${doc.walletAddress?.slice(0, 6)}...${doc.walletAddress?.slice(-4)}</p>
+        </div>
+        <div class="document-details mb-4">
+            <div class="meta-item flex items-center mb-2">
+                <i class="fas fa-file mr-2 text-blue-500"></i>
+                <span class="text-sm">${doc.fileName}</span>
+            </div>
+            <div class="meta-item flex items-center">
+                <i class="fas fa-calendar mr-2 text-blue-500"></i>
+                <span class="text-sm">${new Date(doc.timestamp).toLocaleString()}</span>
+            </div>
+        </div>
+        <div class="document-actions-footer flex space-x-2">
+            <button onclick="viewDocument(${index})" class="view-btn bg-blue-500 text-white px-3 py-1 rounded">
+                <i class="fas fa-eye"></i> View
+            </button>
+            <button onclick="uploadToIPFS(${index})" class="ipfs-btn bg-purple-500 text-white px-3 py-1 rounded" ${doc.ipfsHash ? 'disabled' : ''}>
+                <i class="fas fa-database"></i> Add to IPFS
+            </button>
+            <button onclick="approveDocument(${index})" class="approve-btn bg-green-500 text-white px-3 py-1 rounded" ${doc.status === 'Approved' ? 'disabled' : ''}>
+                <i class="fas fa-check"></i> Approve
+            </button>
+            <button onclick="rejectDocument(${index})" class="reject-btn bg-red-500 text-white px-3 py-1 rounded" ${doc.status === 'Rejected' ? 'disabled' : ''}>
+                <i class="fas fa-times"></i> Reject
+            </button>
+        </div>
+    `;
+    return card;
+}
+
+function viewDocument(index) {
+    const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+    const doc = documents[index];
+    if (doc && doc.fileData) {
+        // Open base64 data in new tab
+        const win = window.open();
+        win.document.write(`
+            <iframe src="${doc.fileData}" frameborder="0" 
+            style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" 
+            allowfullscreen></iframe>
+        `);
+    }
+}
+
+async function uploadToIPFS(index) {
+    const button = event.target.closest('button');
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+    try {
+        const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+        const doc = documents[index];
+
+        // Convert base64 to file
+        const response = await fetch(doc.fileData);
+        const blob = await response.blob();
+        const file = new File([blob], doc.fileName);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Add metadata
+        const metadata = JSON.stringify({
+            name: `${doc.service} Certificate`,
+            description: `${doc.service} certificate for ${doc.panData.name}`,
+            timestamp: doc.timestamp
+        });
+        formData.append('pinataMetadata', metadata);
+
+        const ipfsResponse = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'pinata_api_key': 'f06e5fd1f9bd46842319',
+                'pinata_secret_api_key': '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
+            }
+        });
+
+        // Update document with IPFS hash
+        documents[index].ipfsHash = ipfsResponse.data.IpfsHash;
+        localStorage.setItem('adminDocuments', JSON.stringify(documents));
+
+        button.innerHTML = '<i class="fas fa-check"></i> Added to IPFS';
+        loadDocuments(); // Refresh the display
+
+    } catch (error) {
+        console.error('IPFS upload failed:', error);
+        button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+        button.disabled = false;
+    }
+}
+
+function approveDocument(index) {
+    const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+    documents[index].status = 'Approved';
+    localStorage.setItem('adminDocuments', JSON.stringify(documents));
+    loadDocuments();
+}
+
+function rejectDocument(index) {
+    const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+    documents[index].status = 'Rejected';
+    localStorage.setItem('adminDocuments', JSON.stringify(documents));
+    loadDocuments();
+}
 
 // Apply theme
 function applyTheme(theme) {
@@ -1272,7 +1356,7 @@ function updatePasswordStrength(password) {
         strengthBar.className = 'strength-bar strong';
         strengthText.textContent = 'Strong password';
     }
-} 
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const navToggle = document.querySelector('.nav-toggle');
