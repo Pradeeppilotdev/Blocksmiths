@@ -394,22 +394,30 @@
 
             <!-- Documents Section -->
             <section id="documents" class="dashboard-section">
-                <h1 style="color: black;">DOCS Management</h1>
+                <h1 class="section-title">Document Management</h1>
                 
                 <div class="section-actions">
                     <div class="search-filter">
-                        <input type="text" placeholder="Search documents...">
-                        <select>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search documents..." id="documentSearch">
+                        </div>
+                        <select id="statusFilter">
                             <option value="all">All Documents</option>
-                            <option value="pending">Pending Review</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
+                            <option value="Pending Review">Pending Review</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
                         </select>
                     </div>
+                    <button class="refresh-btn" onclick="loadDocuments()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
                 </div>
                 
-                <div class="documents-grid">
-                    <!-- Documents will be dynamically inserted here -->
+                <div class="documents-container">
+                    <div class="documents-grid">
+                        <!-- Documents will be dynamically inserted here -->
+                    </div>
                 </div>
             </section>
 

@@ -7,6 +7,10 @@ AOS.init({
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Admin dashboard loaded');
     initializeAdminDashboard();
+    
+    // Add event listeners for search and filter
+    document.getElementById('documentSearch').addEventListener('input', filterDocuments);
+    document.getElementById('statusFilter').addEventListener('change', filterDocuments);
 });
 
 function initializeAdminDashboard() {
@@ -547,47 +551,99 @@ function loadDocuments() {
     });
 }
 
+function filterDocuments() {
+    const searchTerm = document.getElementById('documentSearch').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    let documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+    
+    const filteredDocs = documents.filter(doc => {
+        const matchesSearch = doc.panData.name.toLowerCase().includes(searchTerm) ||
+                            doc.fileName.toLowerCase().includes(searchTerm);
+        const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+    });
+    
+    displayDocuments(filteredDocs);
+}
+
+function displayDocuments(documents) {
+    const documentsGrid = document.querySelector('.documents-grid');
+    
+    if (!documents || documents.length === 0) {
+        documentsGrid.innerHTML = `
+            <div class="no-documents">
+                <i class="fas fa-folder-open"></i>
+                <p>No documents found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    documentsGrid.innerHTML = '';
+    documents.forEach((doc, index) => {
+        const card = createDocumentCard(doc, index);
+        documentsGrid.appendChild(card);
+    });
+}
+
 function createDocumentCard(doc, index) {
-    console.log('Creating card for document:', doc);
     const card = document.createElement('div');
-    card.className = 'document-card bg-white rounded-lg shadow-md p-4 mb-4';
+    card.className = 'document-card';
+    
+    const statusClass = doc.status.toLowerCase().replace(' ', '-');
+    
     card.innerHTML = `
-        <div class="document-header border-b pb-3 mb-3">
-            <span class="document-status ${doc.status.toLowerCase().replace(' ', '-')} px-3 py-1 rounded-full text-sm">
-                ${doc.status}
-            </span>
+        <div class="document-header">
+            <span class="document-status ${statusClass}">${doc.status}</span>
+            <span class="document-date">${new Date(doc.timestamp).toLocaleDateString()}</span>
         </div>
-        <div class="user-info mb-4">
-            <h3 class="text-lg font-semibold">${doc.panData.name}</h3>
-            <p class="text-sm text-gray-600">DOB: ${doc.panData.dob}</p>
-            <p class="text-sm text-gray-600">Service: ${doc.service}</p>
-            <p class="text-sm text-gray-600">Wallet: ${doc.walletAddress?.slice(0, 6)}...${doc.walletAddress?.slice(-4)}</p>
+        
+        <div class="user-info">
+            <h3>${doc.panData.name}</h3>
+            <p><i class="fas fa-calendar"></i> DOB: ${doc.panData.dob}</p>
+            <p><i class="fas fa-file-alt"></i> Service: ${doc.service}</p>
+            <p><i class="fas fa-wallet"></i> ${doc.walletAddress?.slice(0, 6)}...${doc.walletAddress?.slice(-4)}</p>
         </div>
-        <div class="document-details mb-4">
-            <div class="meta-item flex items-center mb-2">
-                <i class="fas fa-file mr-2 text-blue-500"></i>
-                <span class="text-sm">${doc.fileName}</span>
+        
+        <div class="document-details">
+            <div class="meta-item">
+                <i class="fas fa-file"></i>
+                <span>${doc.fileName}</span>
             </div>
-            <div class="meta-item flex items-center">
-                <i class="fas fa-calendar mr-2 text-blue-500"></i>
-                <span class="text-sm">${new Date(doc.timestamp).toLocaleString()}</span>
+            <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>${new Date(doc.timestamp).toLocaleTimeString()}</span>
             </div>
         </div>
-        <div class="document-actions-footer flex space-x-2">
-            <button onclick="viewDocument(${index})" class="view-btn bg-blue-500 text-white px-3 py-1 rounded">
+        
+        <div class="document-actions-footer">
+            <button onclick="viewDocument(${index})" class="view-btn">
                 <i class="fas fa-eye"></i> View
             </button>
-            <button onclick="uploadToIPFS(${index})" class="ipfs-btn bg-purple-500 text-white px-3 py-1 rounded" ${doc.ipfsHash ? 'disabled' : ''}>
-                <i class="fas fa-database"></i> Add to IPFS
+            <button onclick="uploadToIPFS(${index})" class="ipfs-btn" ${doc.ipfsHash ? 'disabled' : ''}>
+                <i class="fas fa-cloud-upload-alt"></i> IPFS
             </button>
-            <button onclick="approveDocument(${index})" class="approve-btn bg-green-500 text-white px-3 py-1 rounded" ${doc.status === 'Approved' ? 'disabled' : ''}>
+            <button onclick="approveDocument(${index})" class="approve-btn" ${doc.status === 'Approved' ? 'disabled' : ''}>
                 <i class="fas fa-check"></i> Approve
             </button>
-            <button onclick="rejectDocument(${index})" class="reject-btn bg-red-500 text-white px-3 py-1 rounded" ${doc.status === 'Rejected' ? 'disabled' : ''}>
+            <button onclick="rejectDocument(${index})" class="reject-btn" ${doc.status === 'Rejected' ? 'disabled' : ''}>
                 <i class="fas fa-times"></i> Reject
             </button>
         </div>
+        
+        ${doc.ipfsHash ? `
+        <div class="ipfs-hash-container">
+            <p class="ipfs-label">IPFS Hash:</p>
+            <a href="https://ipfs.io/ipfs/${doc.ipfsHash}" target="_blank" class="ipfs-hash-link">
+                <i class="fas fa-external-link-alt"></i>
+                ${doc.ipfsHash.slice(0, 20)}...${doc.ipfsHash.slice(-8)}
+            </a>
+        </div>
+        ` : ''}
     `;
+    
     return card;
 }
 
@@ -606,50 +662,131 @@ function viewDocument(index) {
 }
 
 async function uploadToIPFS(index) {
-    const button = event.target.closest('button');
-    button.disabled = true;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-
+    const button = document.querySelector(`.documents-grid .document-card:nth-child(${index + 1}) .ipfs-btn`);
+    const card = button.closest('.document-card');
+    const originalText = button.innerHTML;
+    
     try {
+        // Update button and add progress indicator
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
+        button.disabled = true;
+        
+        // Add progress bar to card
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'upload-progress';
+        progressContainer.innerHTML = `
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-text">Preparing file...</div>
+        `;
+        card.appendChild(progressContainer);
+
+        // Get the documents from localStorage
         const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
         const doc = documents[index];
 
-        // Convert base64 to file
-        const response = await fetch(doc.fileData);
-        const blob = await response.blob();
-        const file = new File([blob], doc.fileName);
+        // Optimize file size before upload (if it's an image)
+        let file;
+        if (doc.fileName.match(/\.(jpg|jpeg|png)$/i)) {
+            const optimizedBlob = await optimizeImage(doc.fileData);
+            file = new File([optimizedBlob], doc.fileName);
+        } else {
+            const response = await fetch(doc.fileData);
+            const blob = await response.blob();
+            file = new File([blob], doc.fileName);
+        }
 
+        // Update progress
+        progressContainer.querySelector('.progress-text').textContent = 'Uploading to IPFS...';
+        progressContainer.querySelector('.progress-fill').style.width = '30%';
+
+        // Create form data
         const formData = new FormData();
         formData.append('file', file);
 
-        // Add metadata
-        const metadata = JSON.stringify({
-            name: `${doc.service} Certificate`,
-            description: `${doc.service} certificate for ${doc.panData.name}`,
-            timestamp: doc.timestamp
-        });
-        formData.append('pinataMetadata', metadata);
-
-        const ipfsResponse = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+        // Upload to IPFS via Pinata with timeout and progress tracking
+        const result = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'pinata_api_key': 'f06e5fd1f9bd46842319',
                 'pinata_secret_api_key': '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
+            },
+            timeout: 30000, // 30 second timeout
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 70) / progressEvent.total + 30);
+                progressContainer.querySelector('.progress-fill').style.width = `${percentCompleted}%`;
+                progressContainer.querySelector('.progress-text').textContent = `Uploading: ${percentCompleted}%`;
             }
         });
 
-        // Update document with IPFS hash
-        documents[index].ipfsHash = ipfsResponse.data.IpfsHash;
+        // Update the document with IPFS hash
+        documents[index].ipfsHash = result.data.IpfsHash;
         localStorage.setItem('adminDocuments', JSON.stringify(documents));
 
-        button.innerHTML = '<i class="fas fa-check"></i> Added to IPFS';
-        loadDocuments(); // Refresh the display
+        // Show 100% completion
+        progressContainer.querySelector('.progress-fill').style.width = '100%';
+        progressContainer.querySelector('.progress-text').textContent = 'Upload Complete!';
+
+        // Refresh the card display after a short delay
+        setTimeout(() => {
+            const newCard = createDocumentCard(documents[index], index);
+            card.replaceWith(newCard);
+            showToast('Document uploaded to IPFS successfully!', 'success');
+        }, 1000);
 
     } catch (error) {
-        console.error('IPFS upload failed:', error);
-        button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed';
+        console.error('Error uploading to IPFS:', error);
+        button.innerHTML = originalText;
         button.disabled = false;
+        
+        // Show error in progress bar
+        const progressContainer = card.querySelector('.upload-progress');
+        if (progressContainer) {
+            progressContainer.querySelector('.progress-text').textContent = 'Upload failed - Click IPFS to retry';
+            progressContainer.querySelector('.progress-fill').style.backgroundColor = '#ff4444';
+        }
+        
+        showToast('Failed to upload to IPFS: ' + (error.response?.data?.error || error.message), 'error');
     }
+}
+
+// Add this function to optimize images before upload
+async function optimizeImage(base64Data) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            // Max dimension
+            const MAX_DIMENSION = 1200;
+            
+            // Scale down if image is too large
+            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                if (width > height) {
+                    height = Math.round((height * MAX_DIMENSION) / width);
+                    width = MAX_DIMENSION;
+                } else {
+                    width = Math.round((width * MAX_DIMENSION) / height);
+                    height = MAX_DIMENSION;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert to blob with quality 0.8 for JPG
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, 'image/jpeg', 0.8);
+        };
+        img.src = base64Data;
+    });
 }
 
 function approveDocument(index) {
@@ -1356,7 +1493,7 @@ function updatePasswordStrength(password) {
         strengthBar.className = 'strength-bar strong';
         strengthText.textContent = 'Strong password';
     }
-}
+} 
 
 document.addEventListener('DOMContentLoaded', function() {
     const navToggle = document.querySelector('.nav-toggle');
@@ -1391,3 +1528,22 @@ document.addEventListener('DOMContentLoaded', function() {
         lastScroll = currentScroll;
     });
 });
+
+// Add a toast notification function
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }, 100);
+}
