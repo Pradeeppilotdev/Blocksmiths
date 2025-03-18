@@ -495,8 +495,9 @@
                             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Service</th>
                             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">File Name</th>
                             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Status</th>
-                            <!-- <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">IPFS Hash</th> -->
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">IPFS Hash</th>
                             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Transaction</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Timestamp</th>
                         </tr>
                     </thead>
                     <tbody id="documentStatusTable">
@@ -596,6 +597,16 @@
                 button.disabled = true;
             });
         });
+    </script>
+    <script>
+        // Initialize document updates
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDocumentTable();
+            initializeDocumentUpdates();
+        });
+
+        // Refresh table every 30 seconds
+        setInterval(updateDocumentTable, 30000);
     </script>
 </body>
 </html> 

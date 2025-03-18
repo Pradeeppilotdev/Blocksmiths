@@ -1764,3 +1764,76 @@ body {
 .ipfs-btn .fa-spinner {
     margin-right: 4px;
 }
+
+/* Transaction Hash Styles */
+.transaction-hash {
+    margin-top: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.tx-hash-link {
+    color: #2196F3;
+    text-decoration: none;
+    font-family: monospace;
+    background: #e3f2fd;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.tx-hash-link:hover {
+    background: #bbdefb;
+    color: #1565C0;
+}
+
+.meta-item i {
+    width: 16px;
+    text-align: center;
+    margin-right: 8px;
+    color: #666;
+}
+
+.meta-item.transaction-hash i {
+    color: #2196F3;
+}
+
+/* Push Button Styles */
+.push-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.push-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+}
+
+.push-btn:active {
+    transform: translateY(0);
+}
+
+.push-btn i {
+    font-size: 0.8rem;
+}
+
+/* Update user-info styles */
+.user-info {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.user-info h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+}

@@ -873,6 +873,7 @@ function handleLogout() {
         window.location.href = 'index.html';
     }, 1000);
 }
+
 // Add this new function to update the documents table
 function updateDocumentsTable() {
     const tableBody = document.getElementById('documentStatusTable');
@@ -913,3 +914,68 @@ function updateDocumentsTable() {
         tableBody.appendChild(row);
     });
 }
+
+function updateDocumentTable() {
+    const tableBody = document.getElementById('documentStatusTable');
+    const emptyState = document.getElementById('emptyState');
+    
+    // Get user documents from localStorage
+    const documents = JSON.parse(localStorage.getItem('userDocuments') || '[]');
+    
+    if (documents.length === 0) {
+        tableBody.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    tableBody.innerHTML = documents.map(doc => `
+        <tr class="border-t border-gray-800">
+            <td class="px-6 py-4 text-gray-300">${doc.service}</td>
+            <td class="px-6 py-4 text-gray-300">${doc.fileName}</td>
+            <td class="px-6 py-4">
+                <span class="px-2 py-1 rounded-full text-xs ${
+                    doc.status === 'Approved' ? 'bg-green-900/50 text-green-400' :
+                    doc.status === 'Rejected' ? 'bg-red-900/50 text-red-400' :
+                    'bg-yellow-900/50 text-yellow-400'
+                }">
+                    ${doc.status}
+                </span>
+            </td>
+            <td class="px-6 py-4">
+                ${doc.ipfsHash ? `
+                    <a href="https://ipfs.io/ipfs/${doc.ipfsHash}" 
+                       target="_blank"
+                       class="text-blue-400 hover:text-blue-300">
+                        ${doc.ipfsHash.slice(0, 6)}...${doc.ipfsHash.slice(-4)}
+                    </a>
+                ` : '-'}
+            </td>
+            <td class="px-6 py-4">
+                <a href="https://sepolia.etherscan.io/tx/${doc.transactionHash}"
+                   target="_blank"
+                   class="text-blue-400 hover:text-blue-300">
+                    ${doc.transactionHash.slice(0, 6)}...${doc.transactionHash.slice(-4)}
+                </a>
+            </td>
+            <td class="px-6 py-4 text-gray-400">
+                ${new Date(doc.timestamp).toLocaleString()}
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Add this function to listen for updates
+function initializeDocumentUpdates() {
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'userDocuments') {
+            updateDocumentTable();
+        }
+    });
+}
+
+// Call this when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateDocumentTable();
+    initializeDocumentUpdates();
+});

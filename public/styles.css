@@ -214,4 +214,60 @@ button:hover {
 .service-card:nth-child(1) { animation-delay: 0.1s; }
 .service-card:nth-child(2) { animation-delay: 0.2s; }
 .service-card:nth-child(3) { animation-delay: 0.3s; }
-.service-card:nth-child(4) { animation-delay: 0.4s; } 
+.service-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Document table styles */
+.document-table-container {
+    overflow-x: auto;
+    margin-top: 2rem;
+}
+
+.document-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.document-table th,
+.document-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+}
+
+.document-table th {
+    background-color: rgba(31, 41, 55, 0.5);
+    font-weight: 600;
+    color: #9CA3AF;
+}
+
+.document-table td {
+    background-color: rgba(17, 24, 39, 0.3);
+}
+
+.document-table tr:hover td {
+    background-color: rgba(31, 41, 55, 0.4);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-pending {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #FBBF24;
+}
+
+.status-approved {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #34D399;
+}
+
+.status-rejected {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #F87171;
+} 

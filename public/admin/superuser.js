@@ -601,7 +601,12 @@ function createDocumentCard(doc, index) {
         </div>
         
         <div class="user-info">
-            <h3>${doc.panData.name}</h3>
+            <div class="flex justify-between items-center">
+                <h3>${doc.panData.name}</h3>
+                <button onclick="pushToUser(${index})" class="push-btn">
+                    <i class="fas fa-paper-plane"></i> Push to User
+                </button>
+            </div>
             <p><i class="fas fa-calendar"></i> DOB: ${doc.panData.dob}</p>
             <p><i class="fas fa-file-alt"></i> Service: ${doc.service}</p>
             <p><i class="fas fa-wallet"></i> ${doc.walletAddress?.slice(0, 6)}...${doc.walletAddress?.slice(-4)}</p>
@@ -614,7 +619,17 @@ function createDocumentCard(doc, index) {
             </div>
             <div class="meta-item">
                 <i class="fas fa-clock"></i>
-                <span>${new Date(doc.timestamp).toLocaleTimeString()}</span>
+                <span>${new Date(doc.timestamp).toLocaleString()}</span>
+            </div>
+            <div class="meta-item transaction-hash">
+                <i class="fas fa-receipt"></i>
+                <span>Tx: </span>
+                <a href="https://sepolia.etherscan.io/tx/${doc.transactionHash}" 
+                   target="_blank" 
+                   class="tx-hash-link"
+                   title="View on Etherscan">
+                    ${doc.transactionHash.slice(0, 8)}...${doc.transactionHash.slice(-6)}
+                </a>
             </div>
         </div>
         
@@ -1546,4 +1561,48 @@ function showToast(message, type = 'info') {
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }, 100);
+}
+
+// Add the pushToUser function
+async function pushToUser(index) {
+    try {
+        const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+        const doc = documents[index];
+        
+        if (!doc.status || doc.status === 'Pending Review') {
+            showToast('Please approve or reject the document first', 'error');
+            return;
+        }
+
+        // Create user document data
+        const userDocData = {
+            service: doc.service,
+            fileName: doc.fileName,
+            status: doc.status,
+            ipfsHash: doc.ipfsHash || '',
+            transactionHash: doc.transactionHash,
+            timestamp: doc.timestamp,
+            lastUpdated: new Date().toISOString()
+        };
+
+        // Get existing user documents
+        let userDocs = JSON.parse(localStorage.getItem('userDocuments') || '[]');
+        
+        // Update if exists, add if new
+        const existingIndex = userDocs.findIndex(d => d.transactionHash === doc.transactionHash);
+        if (existingIndex !== -1) {
+            userDocs[existingIndex] = userDocData;
+        } else {
+            userDocs.push(userDocData);
+        }
+
+        // Save back to localStorage
+        localStorage.setItem('userDocuments', JSON.stringify(userDocs));
+        
+        showToast('Document pushed to user successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error pushing to user:', error);
+        showToast('Failed to push document to user', 'error');
+    }
 }
