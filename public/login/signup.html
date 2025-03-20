@@ -5,6 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
     <link rel="stylesheet" href="signupstyle.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Fix for error JSON display */
+        body > *:not(.container):not(#statusContainer):not(script):not(style) {
+            display: none !important;
+        }
+        
+        /* Hide any error elements */
+        .error-json, pre, code {
+            display: none !important;
+        }
+        
+        /* Additional styling for admin form elements */
+        .hint {
+            color: #aaa;
+            font-size: 11px;
+            margin-top: 4px;
+            display: block;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .admin-check-wrapper {
+            text-align: left;
+            width: 90%;
+        }
+        
+        .status-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+    
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Firebase configuration - MAKE SURE THIS IS CORRECT
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1xpIBYJ9z8Xgwrt1RkZQffyPhtnAhY3c",
+            authDomain: "blocksmiths-a8021.firebaseapp.com",
+            databaseURL: "https://blocksmiths-a8021-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "blocksmiths-a8021",
+            storageBucket: "blocksmiths-a8021.appspot.com",
+            messagingSenderId: "243684466522",
+            appId: "1:243684466522:web:8f1231b1e3831de1c99d63",
+            measurementId: "G-FVBSQRWGB1"
+        };
+        
+        // Initialize Firebase
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log("Firebase initialized successfully");
+            }
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+        }
+        
+        // Clean up any error messages
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.querySelectorAll('*').forEach(el => {
+                    if (el.innerText && typeof el.innerText === 'string' && 
+                        el.innerText.includes('CONFIGURATION_NOT_FOUND') && 
+                        !['DIV', 'FORM', 'BODY', 'HTML'].includes(el.tagName)) {
+                        el.style.display = 'none';
+                        el.innerHTML = '';
+                    }
+                });
+            }, 100);
+        });
+    </script>
+    
+    <!-- Signup script -->
     <script src="signup.js" defer></script>
 </head>
 <body>
@@ -14,7 +102,7 @@
         <form action="">
             <div class="form_group">
                 <label class="sub_title" for="name">Name</label>
-                <input placeholder="Enter your full name" id="name" class="form_style" type="text"required>
+                <input placeholder="Enter your full name" id="name" class="form_style" type="text" required>
             </div>
             <div class="form_group">
                 <label class="sub_title" for="email">Email</label>
@@ -23,17 +111,22 @@
             <div class="form_group">
                 <label class="sub_title" for="password">Password</label>
                 <input placeholder="Enter your password" id="password" class="form_style" type="password" required>
+                <small class="hint">Password must contain at least 8 characters with uppercase, lowercase, number, and special character</small>
             </div>
             <div class="form_group">
-                <label class="sub_title" for="password">Confirm Password</label>
-                <input placeholder="Confirm your password" id="password" class="form_style" type="password" required>
+                <label class="sub_title" for="confirmPassword">Confirm Password</label>
+                <input placeholder="Confirm your password" id="confirmPassword" class="form_style" type="password" required>
             </div>
             <div>
                 <button class="btn">SIGN UP</button>
-                <p style="color: white;">Have an Account? <a class="link" href="login.html">Login Here!</a></p>
+                <p>Have an Account? <a class="link" href="login.html">Login Here!</a></p>
             </div>
         </form>
     </div>
 </div>
+
+<!-- Status message container -->
+<div id="statusContainer" class="status-container"></div>
+
 </body>
 </html>

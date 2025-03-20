@@ -113,6 +113,9 @@ body {
     border-left: 3px solid transparent;
     position: relative;
     overflow: hidden;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 10;
 }
 
 .sidebar-nav a::before {
@@ -136,6 +139,7 @@ body {
 .sidebar-nav li.active a {
     color: var(--text-primary);
     border-left-color: var(--primary-color);
+    background-color: rgba(59, 130, 246, 0.1) !important;
 }
 
 .sidebar-nav a i {
@@ -164,6 +168,9 @@ body {
     border-radius: 0.5rem;
     transition: all var(--transition-speed) ease;
     background-color: rgba(239, 68, 68, 0.1);
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 5;
 }
 
 .logout-btn:hover {
@@ -302,10 +309,13 @@ body {
 .dashboard-section {
     padding: 2rem;
     display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .dashboard-section.active {
     display: block;
+    opacity: 1;
 }
 
 .dashboard-section h1 {
@@ -958,6 +968,8 @@ body {
     font-size: 0.75rem;
     width: 100%;
     white-space: nowrap;
+    pointer-events: auto !important;
+    z-index: 5;
 }
 
 .view-btn i {
@@ -965,8 +977,12 @@ body {
 }
 
 .view-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.view-btn:active {
+    transform: translateY(0px);
 }
 
 .view-btn.ipfs-btn {
@@ -1382,7 +1398,9 @@ body {
 }
 
 .document-card {
-    background: white;
+    background-color: var(--secondary-color) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
@@ -1514,6 +1532,8 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
 }
 
 .document-status {
@@ -1521,6 +1541,7 @@ body {
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 500;
+    display: inline-block !important;
 }
 
 .document-status.pending-review {
@@ -1540,6 +1561,7 @@ body {
 
 .user-info {
     margin-bottom: 1.5rem;
+    background-color: rgba(255,255,255,0.05) !important;
 }
 
 .user-info h3 {
@@ -1573,22 +1595,16 @@ body {
 }
 
 .document-actions-footer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
 }
 
 .document-actions-footer button {
-    padding: 8px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: background-color 0.3s;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
 }
 
 .view-btn {
@@ -1836,4 +1852,227 @@ body {
     font-size: 1.2rem;
     font-weight: 600;
     color: #2c3e50;
+}
+
+/* Add styling for clickable filename and file preview modal */
+.clickable-filename {
+    color: #3b82f6;
+    cursor: pointer;
+    transition: color 0.2s;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.clickable-filename:hover {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+.file-preview-modal {
+    /* Styles are set inline in JS for critical properties */
+    animation: fadeIn 0.3s ease-out;
+}
+
+.file-preview-content {
+    /* Styles are set inline in JS for critical properties */
+    animation: slideUp 0.3s ease-out;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Style for IPFS hash containers */
+.ipfs-hash-container {
+    background-color: rgba(30, 41, 59, 0.5);
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ipfs-label {
+    color: #9ca3af;
+    font-size: 12px;
+    margin: 0;
+}
+
+.ipfs-hash-link {
+    color: #3b82f6;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ipfs-hash-link:hover {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+/* Style for document meta items */
+.document-details .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #9ca3af;
+}
+
+.document-details .meta-item i {
+    width: 16px;
+    text-align: center;
+}
+
+/* Fix for dashboard section */
+#dashboard, #users, #documents, #contracts {
+    background-color: var(--background-dark);
+    min-height: 100vh;
+}
+
+/* Fix for buttons */
+.view-btn, .ipfs-btn, .approve-btn, .reject-btn, .logout-btn, .push-btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 5;
+    transition: all 0.2s ease;
+}
+
+.view-btn:hover, .ipfs-btn:hover, .approve-btn:hover, .reject-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.view-btn:active, .ipfs-btn:active, .approve-btn:active, .reject-btn:active, .logout-btn:active {
+    transform: translateY(0px);
+}
+
+.logout-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: var(--danger-color) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0.5rem !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.logout-btn:hover {
+    background-color: rgba(239, 68, 68, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Document section */
+.document-card {
+    background-color: var(--secondary-color) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
+}
+
+.document-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.user-info {
+    background-color: rgba(255,255,255,0.05) !important;
+}
+
+.document-status {
+    display: inline-block !important;
+}
+
+.document-status.approved {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: var(--success-color) !important;
+}
+
+.document-status.pending {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    color: var(--warning-color) !important;
+}
+
+.document-status.rejected {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: var(--danger-color) !important;
+}
+
+/* Fix for document actions */
+.document-actions-footer {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+}
+
+.document-actions-footer button {
+    width: 100% !important;
+    height: auto !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
+}
+
+/* Fix for sidebar navigation links */
+.sidebar-nav a, 
+.sidebar-nav a:hover {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure buttons are clickable */
+.btn,
+button,
+[role="button"],
+.document-card button,
+.action-buttons button {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+.document-card {
+    position: relative;
+    pointer-events: auto !important;
+}
+
+.document-action-btn {
+    margin: 0 5px;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    transition: transform 0.2s ease;
+}
+
+.document-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.logout-btn {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+/* Enhance file name clickability */
+.document-filename {
+    color: #4a6cf7;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.document-filename:hover {
+    color: #2952e3;
 }

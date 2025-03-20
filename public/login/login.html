@@ -3,16 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login page</title>
+    <title>Login</title>
     <link rel="stylesheet" href="loginstyle.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1xpIBYJ9z8Xgwrt1RkZQffyPhtnAhY3c",
+            authDomain: "blocksmiths-a8021.firebaseapp.com",
+            databaseURL: "https://blocksmiths-a8021-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "blocksmiths-a8021",
+            storageBucket: "blocksmiths-a8021.appspot.com",
+            messagingSenderId: "243684466522",
+            appId: "1:243684466522:web:8f1231b1e3831de1c99d63",
+            measurementId: "G-FVBSQRWGB1"
+        };
+        
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase initialized successfully");
+        }
+    </script>
+    
+    <!-- Login script -->
     <script src="login.js" defer></script>
 </head>
-<body >
- <center>
-<!-- From Uiverse.io by mi-series --> 
+<body>
 <div class="container">
     <div class="form_area">
-        <p class="title">Login</p>
+        <p class="title">LOGIN</p>
         <form action="">           
             <div class="form_group">
                 <label class="sub_title" for="email">Email</label>
@@ -23,14 +53,17 @@
                 <input placeholder="Enter your password" id="password" class="form_style" type="password">
             </div>
             <div>
-                <button class="btn" href>LOGIN</button>
-                <p>Already Have an Account? <a class="link" href="signup.html">Sign up</a></p><a class="link" href="">
-                <p><a class="link" href="admin-login.html">ADMIN LOGIN?</a></p><a class="link" href="">   
-                <p><a class="link" href="../Email/email.html">OTP LOGIN?</a></p><a class="link" href="">       
-            </a></div><a class="link" href="">
-                       
-    </a></form></div><a class="link" href="">
-</a></div>
- </center>
+                <button class="btn">LOGIN</button>
+                <p>Don't Have an Account? <a class="link" href="signup.html">Sign up</a></p>
+                <p><a class="link" href="admin-login.html">ADMIN LOGIN?</a></p>
+                <p><a class="link" href="../Email/email.html">OTP LOGIN?</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Status message container -->
+<div id="statusContainer" class="status-container"></div>
+
 </body> 
 </html>

@@ -10,10 +10,17 @@
     
     <!-- Stylesheets -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+    <link href="./styles.css" rel="stylesheet">
     <!-- Use ethers v6 -->
     <script src="https://cdn.ethers.io/lib/ethers-6.7.0.umd.min.js"></script>
     <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+    
+    <!-- Firebase libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="./app.js"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
     <!-- Navbar -->
@@ -498,6 +505,7 @@
                             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">IPFS Hash</th>
                             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Transaction</th>
                             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Timestamp</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-300">Remove</th>
                         </tr>
                     </thead>
                     <tbody id="documentStatusTable">
@@ -568,13 +576,15 @@
     </footer>
 
     <script>
-        const CONTRACT_ADDRESS = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+        // CONTRACT_ADDRESS should match the address in app.js
+        const CONTRACT_ADDRESS = '0xf8e81D47203A594245E36C48e151709F0C19fBe8';
     </script>
     <!-- Load dependencies in correct order -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="app.js"></script>
+    <script src="debugPanel.js"></script>
     <script>
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
@@ -608,5 +618,28 @@
         // Refresh table every 30 seconds
         setInterval(updateDocumentTable, 30000);
     </script>
+    
+    <!-- Hidden Debug Panel - Can be shown with: document.getElementById('debugPanel').style.display = 'block' -->
+    <div id="debugPanel" class="fixed bottom-4 left-4 bg-gray-800 border border-gray-700 p-4 rounded-lg shadow-lg z-50" style="display: none;">
+        <h3 class="text-lg font-semibold mb-2">Debug Panel</h3>
+        <div class="space-y-2">
+            <button 
+                onclick="testFirebaseConnection()" 
+                class="w-full bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm">
+                Test Firebase Connection
+            </button>
+            <button 
+                onclick="createTestDocument()" 
+                class="w-full bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg text-sm">
+                Create Test Document
+            </button>
+            <button 
+                onclick="listAllDocuments()" 
+                class="w-full bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg text-sm">
+                List All Documents
+            </button>
+        </div>
+        <p class="mt-2 text-xs text-gray-400">Check browser console for results</p>
+    </div>
 </body>
 </html>

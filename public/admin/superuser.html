@@ -11,6 +11,32 @@
     <link rel="stylesheet" href="styles/documents.css">
     <link rel="stylesheet" href="styles/contracts.css">
     <link rel="stylesheet" href="styles/settings.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1xpIBYJ9z8Xgwrt1RkZQffyPhtnAhY3c",
+            authDomain: "blocksmiths-a8021.firebaseapp.com",
+            databaseURL: "https://blocksmiths-a8021-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "blocksmiths-a8021",
+            storageBucket: "blocksmiths-a8021.firebasestorage.app",
+            messagingSenderId: "243684466522",
+            appId: "1:243684466522:web:8f1231b1e3831de1c99d63",
+            measurementId: "G-FVBSQRWGB1"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Log successful initialization
+        console.log("Firebase initialized for admin dashboard");
+    </script>
 </head>
 <body>
     <div class="container">
@@ -24,16 +50,24 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li class="active">
-                        <a href="#dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a onclick="showPage('dashboard'); return false;">
+                            <i class="uil uil-dashboard"></i> Dashboard
+                        </a>
                     </li>
                     <li>
-                        <a href="#users"><i class="fas fa-users"></i> Users</a>
+                        <a onclick="showPage('users'); return false;">
+                            <i class="uil uil-users-alt"></i> Users
+                        </a>
                     </li>
                     <li>
-                        <a href="#documents"><i class="fas fa-file-alt"></i> Documents</a>
+                        <a onclick="showPage('documents'); return false;">
+                            <i class="uil uil-file-alt"></i> Documents
+                        </a>
                     </li>
                     <li>
-                        <a href="#contracts"><i class="fas fa-file-contract"></i> Contracts</a>
+                        <a onclick="showPage('contracts'); return false;">
+                            <i class="uil uil-file-contract"></i> Contracts
+                        </a>
                     </li>
                     
                     
@@ -41,7 +75,7 @@
             </nav>
             
             <div class="sidebar-footer">
-                <a href="#logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="../index.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
         </aside>
 
