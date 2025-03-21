@@ -607,7 +607,7 @@ async function disconnectWallet() {
         showSuccess('Wallet disconnected successfully!');
     } catch (error) {
         console.error('Disconnection error:', error);
-        showError(error.message);
+        //showError(error.message);
     }
 }
 
@@ -1029,7 +1029,7 @@ async function handlePayment(service) {
         
         // Reset button state
         if (payButton) {
-            payButton.innerHTML = `<span class="payment-text">${originalText}</span>`;
+            payButton.innerHTML = `<span class="payment-text">✔️Document Submitted</span>`;
             payButton.disabled = false;
         }
         
@@ -1261,7 +1261,7 @@ async function updateTransactionDetails(service, panNumber, transactionHash) {
 // Helper function to reset UI after payment
 function resetUIAfterPayment(service, originalText) {
     const payButton = document.getElementById(`payButton-${service}`);
-    payButton.innerHTML = `<span class="payment-text">${originalText}</span>`;
+    payButton.innerHTML = `<span class="payment-text">✔️Document Submitted</span>`;
     payButton.disabled = false;
     delete selectedFiles[service];
     document.getElementById(`certificateFile-${service}`).value = '';
@@ -1980,9 +1980,9 @@ function viewFile(docId) {
                     ${ipfsHashDisplay}
                     ${transactionHashDisplay}
                     <div class="mt-4 flex justify-center">
-                        <button onclick="hideSuccess()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <!-- <button onclick="hideSuccess()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
                             Close
-                        </button>
+                        </button> -->
                     </div>
                 `);
                 
@@ -2030,9 +2030,9 @@ function viewFile(docId) {
                     </div>
                     ${transactionHashDisplay}
                     <div class="mt-4 flex justify-center">
-                        <button onclick="hideSuccess()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <!-- <button onclick="hideSuccess()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
                             Close
-                        </button>
+                        </button> -->
                     </div>
                 `);
             } else {
@@ -2187,7 +2187,7 @@ async function processPayment(service) {
             
             // After 3 seconds, reset the button
             setTimeout(() => {
-                payButton.innerHTML = `<span class="payment-text">${originalText}</span>`;
+                payButton.innerHTML = `<span class="payment-text">✔️Document Submitted</span>`;
                 payButton.disabled = true; // Keep it disabled to prevent double payments
                 payButton.classList.add('bg-green-500');
                 payButton.classList.remove('bg-blue-500');
@@ -2203,9 +2203,9 @@ async function processPayment(service) {
                 <button id="submitDocumentBtn-${service}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
                     Submit Document
                 </button>
-                <button onclick="hideSuccess()" class="ml-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <!-- <button onclick="hideSuccess()" class="ml-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
                     Close
-                </button>
+                </button> -->
             </div>
         `);
         
@@ -2227,7 +2227,7 @@ async function processPayment(service) {
         
         // Reset button state
         if (payButton) {
-            payButton.innerHTML = `<span class="payment-text">${originalText}</span>`;
+            payButton.innerHTML = `<span class="payment-text">✔️Document Submitted</span>`;
             payButton.disabled = false;
         }
         
@@ -2365,9 +2365,9 @@ async function submitDocument(service) {
             <h3 class="text-xl font-bold mb-4">Document Submitted Successfully!</h3>
             <p class="mb-4">Your document has been submitted and will be processed shortly.</p>
             <p class="text-sm text-gray-400 mb-4">Document ID: ${documentId}</p>
-            <button onclick="hideSuccess()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+            <!-- <button onclick="hideSuccess()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
                 Close
-            </button>
+            </button> -->
         `);
         
         // Update the document table

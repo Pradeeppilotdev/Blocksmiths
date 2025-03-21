@@ -218,9 +218,10 @@ button:active::after {
 }
 
 #successAlert {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    color: #10B981;
+    background: rgba(21, 22, 22, 0.925);
+    border: 6px solid rgba(26, 26, 26, 0.2);
+    color: #f3f8f6;
+    box-shadow: var(--shadow-md);
 }
 
 #errorAlert {
