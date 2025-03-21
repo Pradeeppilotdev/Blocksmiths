@@ -978,7 +978,7 @@ async function approveDocument(index) {
     
     try {
         // Show loading toast
-        showToast('Uploading document to IPFS and approving...', 'info');
+        // showToast('Uploading document to IPFS and approving...', 'info');
         
         // First, upload to IPFS if not already uploaded
         if (!doc.ipfsHash) {
@@ -1843,7 +1843,7 @@ function showToast(message, type = 'info') {
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
         <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        <span>${message}</span>
+        <span style="color: black !important;">${message}</span>
     `;
     document.body.appendChild(toast);
     
