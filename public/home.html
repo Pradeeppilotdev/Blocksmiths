@@ -12,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="./styles.css" rel="stylesheet">
     <!-- Use ethers v6 -->
-    <script src="https://cdn.ethers.io/lib/ethers-6.7.0.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js" type="application/javascript"></script>
     <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
     
     <!-- Firebase libraries -->
@@ -30,7 +30,7 @@
                 <div class="flex items-center space-x-3">
                     <div class="p-2 bg-blue-500/10 rounded-lg">
                         <svg class="h-6 w-6 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6H4z"/>
+                            <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
                             <path d="M10 7h4M10 17h4M7 10v4M17 10v4" stroke-linecap="round"/>
                         </svg>
                     </div>
@@ -577,13 +577,13 @@
 
     <script>
         // CONTRACT_ADDRESS should match the address in app.js
-        const CONTRACT_ADDRESS = '0xf8e81D47203A594245E36C48e151709F0C19fBe8';
+        const CONTRACT_ADDRESS = '0x8a8D3b51DD43d5673322ceA64f8957F2eca92ccD';
     </script>
     <!-- Load dependencies in correct order -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js" type="application/javascript"></script>
+    <script src="./app.js"></script>
     <script src="debugPanel.js"></script>
     <script>
         // Initialize the application
@@ -641,5 +641,18 @@
         </div>
         <p class="mt-2 text-xs text-gray-400">Check browser console for results</p>
     </div>
+    <script>
+        // Add this after your other scripts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Test click handlers
+            const payButtons = document.querySelectorAll('[id^="payButton-"]');
+            payButtons.forEach(button => {
+                console.log(`Adding test click handler to ${button.id}`);
+                button.addEventListener('click', function() {
+                    console.log(`Button ${this.id} was clicked`);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contract Test</title>
+    <!-- Using ethers.js from jsDelivr CDN instead -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js" 
+            type="application/javascript"></script>
+</head>
+<body>
+    <h1>Contract Test</h1>
+    <button id="testButton">Test Contract</button>
+    <div id="result"></div>
+
+    <script>
+        // Check if ethers loaded properly
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof window.ethers === 'undefined') {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color:red">Error: ethers.js library failed to load. Check console for details.</p>';
+                console.error('ethers.js library not loaded. Try refreshing the page or check your internet connection.');
+            } else {
+                console.log('ethers.js loaded successfully. Version:', window.ethers.version);
+                document.getElementById('result').innerHTML = 
+                    '<p>ethers.js loaded successfully. Click the button to test the contract.</p>';
+            }
+        });
+
+        const contractAddress = '0x8a8D3b51DD43d5673322ceA64f8957F2eca92ccD';
+        const contractABI = [
+            {
+              "inputs": [],
+              "name": "owner",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "string",
+                  "name": "service",
+                  "type": "string"
+                }
+              ],
+              "name": "getServiceFee",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+        ];
+
+        document.getElementById('testButton').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                // First check if ethers is available
+                if (typeof window.ethers === 'undefined') {
+                    throw new Error('ethers.js library not loaded');
+                }
+                
+                // Then check if MetaMask is available
+                if (!window.ethereum) {
+                    throw new Error('MetaMask not found. Please install MetaMask and refresh the page.');
+                }
+                
+                // Request accounts
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                resultDiv.innerHTML += `<p>Connected account: ${accounts[0]}</p>`;
+                
+                // Create provider and signer (ethers v6 syntax)
+                const provider = new window.ethers.BrowserProvider(window.ethereum);
+                resultDiv.innerHTML += `<p>Provider created</p>`;
+                
+                const signer = await provider.getSigner();
+                resultDiv.innerHTML += `<p>Signer created</p>`;
+                
+                // Create contract instance
+                const contract = new window.ethers.Contract(contractAddress, contractABI, signer);
+                resultDiv.innerHTML += `<p>Contract created</p>`;
+                
+                // Test owner function
+                const owner = await contract.owner();
+                resultDiv.innerHTML += `<p>Contract owner: ${owner}</p>`;
+                
+                // Test getServiceFee function
+                const fee = await contract.getServiceFee('electricity');
+                resultDiv.innerHTML += `<p>Electricity fee: ${window.ethers.formatEther(fee)} ETH</p>`;
+                
+                resultDiv.innerHTML += `<p style="color:green">All tests passed!</p>`;
+            } catch (error) {
+                console.error('Test error:', error);
+                resultDiv.innerHTML += `<p style="color:red">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

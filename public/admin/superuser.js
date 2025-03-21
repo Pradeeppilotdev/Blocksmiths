@@ -582,102 +582,60 @@ function showPage(sectionId) {
 }
 
 function loadDocuments() {
-    console.log('Loading documents...');
-    const documentsGrid = document.querySelector('.documents-grid');
+    console.log('Loading documents from Firebase...');
     
-    // Initialize Firebase (if not already initialized)
-    if (!window.firebase) {
-        console.error('Firebase not initialized');
-        return;
+    // Show loading indicator
+    const documentsGrid = document.querySelector('.documents-grid');
+    if (documentsGrid) {
+        documentsGrid.innerHTML = `
+            <div class="loading-indicator">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading documents...</p>
+            </div>
+        `;
     }
     
-    try {
-        const firebaseDb = firebase.database();
-        
-        if (!firebaseDb) {
-            console.error('Firebase database not initialized');
-            documentsGrid.innerHTML = `
-                <div class="text-center py-12">
-                    <i class="fas fa-exclamation-circle text-4xl mb-4 text-red-400"></i>
-                    <p class="text-red-500">Firebase database not initialized</p>
-                </div>
-            `;
-            return;
-        }
-        
-        // Show loading state
-        documentsGrid.innerHTML = `
-            <div class="text-center py-12">
-                <i class="fas fa-spinner fa-spin text-4xl mb-4 text-blue-400"></i>
-                <p class="text-gray-500">Loading documents...</p>
-            </div>
-        `;
-        
-        // Query Firebase for all documents
-        const dbRef = firebaseDb.ref('userDocuments');
-        dbRef.once('value', (snapshot) => {
-            if (!snapshot.exists()) {
-                documentsGrid.innerHTML = `
-                    <div class="text-center py-12">
-                        <i class="fas fa-folder-open text-4xl mb-4 text-gray-400"></i>
-                        <p class="text-gray-500">No documents uploaded yet</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Convert snapshot to array and sort by timestamp (newest first)
-            const documents = [];
-            snapshot.forEach((childSnapshot) => {
-                documents.push({
-                    id: childSnapshot.key,
-                    ...childSnapshot.val()
-                });
+    // Get documents from Firebase
+    const firebaseDb = firebase.database();
+    if (firebaseDb) {
+        firebaseDb.ref('userDocuments').once('value')
+            .then((snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    console.log('No documents found in Firebase');
+                    displayDocuments([]);
+                    return;
+                }
+                
+                // Convert Firebase object to array and add ID
+                const documents = Object.entries(data).map(([id, doc]) => ({
+                    ...doc,
+                    id: id
+                }));
+                
+                console.log(`Loaded ${documents.length} documents from Firebase`);
+                
+                // Save to localStorage for faster access
+                localStorage.setItem('adminDocuments', JSON.stringify(documents));
+                
+                // Display the documents
+                displayDocuments(documents);
+            })
+            .catch((error) => {
+                console.error('Error loading documents from Firebase:', error);
+                showToast('Error loading documents: ' + error.message, 'error');
+                
+                // Try to load from localStorage as fallback
+                const cachedDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+                displayDocuments(cachedDocuments);
             });
-            
-            console.log('Documents loaded from Firebase:', documents.length);
-            
-            // Sort by timestamp (newest first)
-            documents.sort((a, b) => b.createdAt - a.createdAt);
-            
-            // Clear grid and add documents
-            documentsGrid.innerHTML = '';
-            
-            if (documents.length === 0) {
-                documentsGrid.innerHTML = `
-                    <div class="text-center py-12">
-                        <i class="fas fa-folder-open text-4xl mb-4 text-gray-400"></i>
-                        <p class="text-gray-500">No documents uploaded yet</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            documents.forEach((doc, index) => {
-                const card = createDocumentCard(doc, index);
-                documentsGrid.appendChild(card);
-            });
-            
-            // Save to localStorage for other functions to use
-            localStorage.setItem('adminDocuments', JSON.stringify(documents));
-            
-        }, (error) => {
-            console.error('Error loading documents from Firebase:', error);
-            documentsGrid.innerHTML = `
-                <div class="text-center py-12">
-                    <i class="fas fa-exclamation-circle text-4xl mb-4 text-red-400"></i>
-                    <p class="text-red-500">Error loading documents: ${error.message}</p>
-                </div>
-            `;
-        });
-    } catch (e) {
-        console.error('Error in loadDocuments:', e);
-        documentsGrid.innerHTML = `
-            <div class="text-center py-12">
-                <i class="fas fa-exclamation-circle text-4xl mb-4 text-red-400"></i>
-                <p class="text-red-500">Error: ${e.message}</p>
-            </div>
-        `;
+    } else {
+        console.error('Firebase database not initialized');
+        showToast('Firebase database not initialized', 'error');
+        
+        // Try to load from localStorage as fallback
+        const cachedDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+        displayDocuments(cachedDocuments);
     }
 }
 
@@ -914,6 +872,8 @@ async function uploadToIPFS(index) {
             }
         });
 
+        console.log('IPFS upload result:', result.data);
+
         // Update the document with IPFS hash
         documents[index].ipfsHash = result.data.IpfsHash;
         
@@ -922,11 +882,16 @@ async function uploadToIPFS(index) {
             try {
                 const firebaseDb = firebase.database();
                 if (firebaseDb) {
-                    await firebaseDb.ref('userDocuments/' + doc.id).update({
+                    // Get the document reference
+                    const docRef = doc.id.includes('/') ? doc.id : 'userDocuments/' + doc.id;
+                    
+                    // Update the document with IPFS hash
+                    await firebaseDb.ref(docRef).update({
+                        ipfsHash: result.data.IpfsHash,
                         'fileDetails.ipfsHash': result.data.IpfsHash,
                         'fileDetails.ipfsUrl': `https://ipfs.io/ipfs/${result.data.IpfsHash}`
                     });
-                    console.log('Updated Firebase with IPFS hash');
+                    console.log('Updated Firebase with IPFS hash:', result.data.IpfsHash);
                 }
             } catch (firebaseError) {
                 console.error('Failed to update Firebase:', firebaseError);
@@ -1001,7 +966,8 @@ async function optimizeImage(base64Data) {
     });
 }
 
-function approveDocument(index) {
+// Fix the approveDocument function to generate a real IPFS hash
+async function approveDocument(index) {
     const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
     const doc = documents[index];
     
@@ -1011,11 +977,58 @@ function approveDocument(index) {
     }
     
     try {
-        // Generate IPFS hash if missing - this should ONLY happen during approval
-        const mockHash = doc.ipfsHash || ('QmXn2PZvkAo7D99pxJ9z' + Math.random().toString(36).substring(2, 10));
-        documents[index].ipfsHash = mockHash;
+        // Show loading toast
+        showToast('Uploading document to IPFS and approving...', 'info');
         
-        // Update status in localStorage
+        // First, upload to IPFS if not already uploaded
+        if (!doc.ipfsHash) {
+            // Get file details from correct location
+            const fileName = doc.fileDetails?.fileName || doc.fileName || 'document';
+            const fileData = doc.fileDetails?.fileContent || doc.fileData;
+            
+            if (!fileData) {
+                throw new Error('No file data available to upload');
+            }
+
+            // Determine file type from the file name or default to application/octet-stream
+            const fileType = fileName.includes('.') ? 
+                `application/${fileName.split('.').pop().toLowerCase()}` : 
+                'application/octet-stream';
+
+            // Optimize file size before upload (if it's an image)
+            let file;
+            if (fileName.match(/\.(jpg|jpeg|png)$/i)) {
+                const optimizedBlob = await optimizeImage(fileData);
+                file = new File([optimizedBlob], fileName);
+            } else {
+                const response = await fetch(fileData);
+                const blob = await response.blob();
+                file = new File([blob], fileName, { type: fileType });
+            }
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Upload to IPFS via Pinata
+            console.log('Uploading to IPFS...');
+            const result = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'pinata_api_key': 'f06e5fd1f9bd46842319',
+                    'pinata_secret_api_key': '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
+                },
+                timeout: 30000 // 30 second timeout
+            });
+
+            console.log('IPFS upload result:', result.data);
+            
+            // Set the real IPFS hash
+            documents[index].ipfsHash = result.data.IpfsHash;
+            localStorage.setItem('adminDocuments', JSON.stringify(documents));
+        }
+        
+        // Now update status in localStorage
         documents[index].status = 'Approved';
         localStorage.setItem('adminDocuments', JSON.stringify(documents));
         
@@ -1023,11 +1036,10 @@ function approveDocument(index) {
         const firebaseDb = firebase.database();
         if (firebaseDb && doc.id) {
             // Create a new document object with updated values
-            // Instead of using dot notation in keys which causes Firebase errors
             const updatedDoc = {
                 status: 'Approved',
                 lastUpdated: new Date().getTime(),
-                ipfsHash: mockHash
+                ipfsHash: documents[index].ipfsHash // Use the real IPFS hash
             };
             
             // Create a separate fileDetails object if it doesn't exist
@@ -1037,8 +1049,8 @@ function approveDocument(index) {
                     const fileDetails = existingDoc.fileDetails || {};
                     
                     // Update the fileDetails with IPFS hash
-                    fileDetails.ipfsHash = mockHash;
-                    fileDetails.ipfsUrl = `https://ipfs.io/ipfs/${mockHash}`;
+                    fileDetails.ipfsHash = documents[index].ipfsHash;
+                    fileDetails.ipfsUrl = `https://ipfs.io/ipfs/${documents[index].ipfsHash}`;
                     
                     // Update the whole document with new fileDetails
                     return firebaseDb.ref('userDocuments/' + doc.id).update({
@@ -1047,7 +1059,7 @@ function approveDocument(index) {
                     });
                 })
                 .then(() => {
-                    showToast('Document approved and IPFS hash generated successfully!', 'success');
+                    showToast('Document approved and uploaded to IPFS successfully!', 'success');
                     loadDocuments(); // Refresh the documents list
                 })
                 .catch(error => {
