@@ -448,6 +448,10 @@
                     </button>
                 </div>
                 
+                <p class="document-info" style="color: white; font-size: 14px; margin: 10px 0;">
+                    Documents are paginated to improve performance. Large documents will be loaded on-demand.
+                </p>
+                
                 <div class="documents-container">
                     <div class="documents-grid">
                         <!-- Documents will be dynamically inserted here -->
@@ -641,6 +645,71 @@
     <script>
         // Add this to check if documents are loading
         console.log('Initial documents:', JSON.parse(localStorage.getItem('adminDocuments') || '[]'));
+        
+        // Debug function to check memory usage
+        function checkMemoryUsage() {
+            if (window.performance && window.performance.memory) {
+                const memoryInfo = window.performance.memory;
+                console.log('Memory usage stats:');
+                console.log(`- Total JS heap size: ${(memoryInfo.totalJSHeapSize / (1024 * 1024)).toFixed(2)}MB`);
+                console.log(`- JS heap size limit: ${(memoryInfo.jsHeapSizeLimit / (1024 * 1024)).toFixed(2)}MB`);
+                console.log(`- Used JS heap size: ${(memoryInfo.usedJSHeapSize / (1024 * 1024)).toFixed(2)}MB`);
+                
+                const usagePercentage = (memoryInfo.usedJSHeapSize / memoryInfo.jsHeapSizeLimit) * 100;
+                console.log(`- Heap usage: ${usagePercentage.toFixed(2)}%`);
+                
+                // Log localStorage usage
+                let localStorageSize = 0;
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    localStorageSize += key.length + value.length;
+                }
+                
+                console.log(`localStorage usage: ${(localStorageSize / (1024 * 1024)).toFixed(2)}MB`);
+                
+                // If we have adminDocuments in memory, log its size too
+                if (window.adminDocuments) {
+                    const adminDocsString = JSON.stringify(window.adminDocuments);
+                    console.log(`adminDocuments size in memory: ${(adminDocsString.length / (1024 * 1024)).toFixed(2)}MB`);
+                }
+            } else {
+                console.log('Performance API memory info not available in this browser');
+            }
+        }
+        
+        // Run memory check when loaded and after documents are loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(checkMemoryUsage, 2000); // Check after 2 seconds
+        });
+        
+        // Add a global error handler for localStorage quota errors
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('exceeded the quota') && e.message.includes('localStorage')) {
+                console.error('localStorage quota exceeded. Using in-memory storage only.');
+                // Create a notification for the user
+                const notification = document.createElement('div');
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.padding = '15px 20px';
+                notification.style.background = '#d32f2f';
+                notification.style.color = 'white';
+                notification.style.borderRadius = '4px';
+                notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+                notification.style.zIndex = '9999';
+                notification.textContent = 'Storage limit exceeded. Some data will only be available in this session.';
+                
+                document.body.appendChild(notification);
+                
+                // Remove notification after 10 seconds
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s';
+                    setTimeout(() => notification.remove(), 500);
+                }, 10000);
+            }
+        });
     </script>
 </body>
 </html>

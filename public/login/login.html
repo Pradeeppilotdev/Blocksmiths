@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="loginstyle.css">
+    <!-- Try multiple CSS paths to ensure at least one works -->
+    <link rel="stylesheet" href="loginstyle.css?v=1.0">
+    <link rel="stylesheet" href="./loginstyle.css?v=1.0">
+    <link rel="stylesheet" href="/public/login/loginstyle.css?v=1.0">
+    <link rel="stylesheet" href="../login/loginstyle.css?v=1.0">
+    
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -34,10 +39,204 @@
             firebase.initializeApp(firebaseConfig);
             console.log("Firebase initialized successfully");
         }
+        
+        // Immediately sign out any existing user to prevent auto-redirect
+        firebase.auth().signOut().then(() => {
+            console.log("Signed out existing user");
+            // Clear any cached user data in localStorage
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userUid');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('user');
+            localStorage.removeItem('wallet');
+            localStorage.removeItem('walletAddress');
+            console.log("Cleared local storage");
+        }).catch(error => {
+            console.error("Error signing out:", error);
+        });
     </script>
+    
+    <!-- Embed critical CSS directly in the page -->
+    <style>
+        /* Essential styles from loginstyle.css */
+        body {
+          background-color: #171f2e;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          padding: 0;
+          font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        .container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          text-align: center;
+          width: 100%;
+          max-width: 500px;
+          padding: 20px;
+          margin: 0 auto;
+        }
+        
+        .form_area {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          background-color: #374151;
+          height: auto;
+          width: 100%;
+          padding: 25px;
+          border: 2px solid #264143;
+          border-radius: 15px;
+          box-shadow: 3px 4px 0px 1px #3b82f6;
+        }
+        
+        .title {
+          color: white;
+          font-weight: 900;
+          font-size: 1.8em;
+          margin: 15px 0;
+          line-height: 1.2;
+        }
+        
+        .sub_title {
+          color: white;
+          font-weight: 600;
+          margin: 5px 0;
+          font-size: 15px;
+        }
+        
+        .form_group {
+          display: flex;
+          flex-direction: column;
+          align-items: baseline;
+          margin: 12px 0;
+          width: 90%;
+        }
+        
+        form {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .form_style {
+          outline: none;
+          border: 2px solid #264143;
+          box-shadow: 3px 4px 0px 1px #3b82f6;
+          width: 100%;
+          padding: 14px;
+          border-radius: 4px;
+          font-size: 15px;
+          box-sizing: border-box;
+          background-color: #1f2937;
+          color: white;
+        }
+        
+        .form_style::placeholder {
+          color: #9ca3af;
+        }
+        
+        .btn {
+          padding: 16px;
+          margin: 25px 0;
+          width: 90%;
+          font-size: 17px;
+          background: #3b82f6;
+          border-radius: 10px;
+          font-weight: 800;
+          box-shadow: 3px 3px 0px 0px white;
+          cursor: pointer;
+          color: white;
+          border: none;
+          transition: all 0.3s ease;
+        }
+        
+        .link {
+          font-weight: 800;
+          color: #3b82f6;
+          padding: 5px;
+          text-decoration: none;
+          font-size: 15px;
+        }
+        
+        p {
+          color: white;
+          font-size: 15px;
+          line-height: 1.5;
+        }
+        
+        /* Debug tools */
+        #debug {
+            display: none;
+            background-color: #212121;
+            color: #4CAF50;
+            font-family: monospace;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        
+        #auth-troubleshooter {
+            margin-top: 15px;
+            display: none;
+            padding: 10px;
+            background-color: rgba(33, 33, 33, 0.7);
+            border-radius: 8px;
+        }
+        
+        .troubleshooter-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #DDD;
+        }
+        
+        .troubleshooter-button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .troubleshooter-button:hover {
+            background-color: #444;
+        }
+        
+        .test-active {
+            outline: 5px solid yellow !important;
+        }
+    </style>
     
     <!-- Login script -->
     <script src="login.js" defer></script>
+    
+    <script>
+        // Add test class to body after load to confirm styles are working
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.body.classList.add('test-active');
+                console.log("Added test-active class to body");
+            }, 500);
+        });
+    </script>
 </head>
 <body>
 <div class="container">
@@ -57,13 +256,270 @@
                 <p>Don't Have an Account? <a class="link" href="signup.html">Sign up</a></p>
                 <p><a class="link" href="admin-login.html">ADMIN LOGIN?</a></p>
                 <p><a class="link" href="../Email/email.html">OTP LOGIN?</a></p>
+                
+                <!-- CSS Diagnostic Button -->
+                <button type="button" id="css-diagnostic-btn" style="background-color: #333; color: white; border: none; padding: 5px 10px; margin-top: 15px; border-radius: 4px; cursor: pointer; font-size: 12px; display: none;">
+                    Test CSS Loading
+                </button>
             </div>
         </form>
+        
+        <!-- Debug container (hidden by default) -->
+        <div id="debug"></div>
+        
+        <!-- Auth troubleshooter -->
+        <div id="auth-troubleshooter">
+            <div class="troubleshooter-title">Authentication Troubleshooter</div>
+            <button class="troubleshooter-button" id="check-email-btn">Check Email in Database</button>
+            <button class="troubleshooter-button" id="check-auth-btn">Check Auth State</button>
+            <button class="troubleshooter-button" id="list-db-users-btn">List Database Users</button>
+            <button class="troubleshooter-button" id="reset-local-storage-btn">Reset Local Storage</button>
+        </div>
     </div>
 </div>
 
 <!-- Status message container -->
 <div id="statusContainer" class="status-container"></div>
+
+<script>
+    // Show CSS diagnostic button with Shift+C
+    document.addEventListener('keydown', function(e) {
+        if (e.shiftKey && e.key === 'C') {
+            const diagnosticBtn = document.getElementById('css-diagnostic-btn');
+            diagnosticBtn.style.display = diagnosticBtn.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+    
+    // CSS diagnostic button functionality
+    document.getElementById('css-diagnostic-btn').addEventListener('click', function() {
+        // Create a diagnostic report
+        let report = "CSS Loading Diagnostic Report\n\n";
+        report += "Time: " + new Date().toLocaleString() + "\n";
+        report += "URL: " + window.location.href + "\n\n";
+        
+        // Check all stylesheets
+        report += "Stylesheet Status:\n";
+        const styles = document.querySelectorAll('link[rel="stylesheet"]');
+        styles.forEach(styleSheet => {
+            report += `${styleSheet.href || 'inline style'}: ${styleSheet.sheet ? 'LOADED' : 'FAILED'}\n`;
+            
+            // Try to fetch the CSS directly
+            if (styleSheet.href && !styleSheet.href.startsWith('data:')) {
+                fetch(styleSheet.href)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`CSS fetch successful: ${styleSheet.href}`);
+                            return response.text();
+                        } else {
+                            console.error(`CSS fetch failed with status ${response.status}: ${styleSheet.href}`);
+                            throw new Error(`Status ${response.status}`);
+                        }
+                    })
+                    .then(cssText => {
+                        console.log(`CSS content length: ${cssText.length} bytes`);
+                        // Create a download link for the CSS
+                        const cssFileName = styleSheet.href.split('/').pop();
+                        const blob = new Blob([cssText], {type: 'text/css'});
+                        const cssUrl = URL.createObjectURL(blob);
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = cssUrl;
+                        downloadLink.download = cssFileName || 'style.css';
+                        downloadLink.textContent = `Download ${cssFileName || 'CSS file'}`;
+                        downloadLink.style.display = 'block';
+                        downloadLink.style.marginTop = '5px';
+                        downloadLink.style.color = '#3b82f6';
+                        document.getElementById('css-diagnostic-btn').parentNode.appendChild(downloadLink);
+                    })
+                    .catch(error => {
+                        console.error(`CSS fetch error: ${error}`, styleSheet.href);
+                    });
+            }
+        });
+        
+        // Computed styles
+        report += "\nComputed Styles:\n";
+        report += `Body background: ${window.getComputedStyle(document.body).backgroundColor}\n`;
+        report += `Body color: ${window.getComputedStyle(document.body).color}\n`;
+        report += `Form background: ${window.getComputedStyle(document.querySelector('.form_area')).backgroundColor}\n`;
+        
+        // Create a log element
+        const logElement = document.createElement('pre');
+        logElement.textContent = report;
+        logElement.style.backgroundColor = '#f8f9fa';
+        logElement.style.color = '#212529';
+        logElement.style.padding = '15px';
+        logElement.style.marginTop = '15px';
+        logElement.style.borderRadius = '4px';
+        logElement.style.whiteSpace = 'pre-wrap';
+        logElement.style.wordBreak = 'break-all';
+        logElement.style.maxHeight = '300px';
+        logElement.style.overflowY = 'auto';
+        logElement.style.fontSize = '12px';
+        logElement.style.fontFamily = 'monospace';
+        
+        // Add to the page
+        this.parentNode.appendChild(logElement);
+        
+        // Create download report button
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = 'Download Report';
+        downloadBtn.style.backgroundColor = '#3b82f6';
+        downloadBtn.style.color = 'white';
+        downloadBtn.style.border = 'none';
+        downloadBtn.style.padding = '5px 10px';
+        downloadBtn.style.marginTop = '10px';
+        downloadBtn.style.borderRadius = '4px';
+        downloadBtn.style.cursor = 'pointer';
+        downloadBtn.style.fontSize = '12px';
+        
+        downloadBtn.addEventListener('click', function() {
+            const blob = new Blob([report], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'css-diagnostic-report.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+        
+        this.parentNode.appendChild(downloadBtn);
+    });
+    
+    // Debug activation (press Shift+D to toggle)
+    document.addEventListener('keydown', function(e) {
+        if (e.shiftKey && e.key === 'D') {
+            const debugElement = document.getElementById('debug');
+            const troubleshooterElement = document.getElementById('auth-troubleshooter');
+            
+            debugElement.style.display = debugElement.style.display === 'none' ? 'block' : 'none';
+            troubleshooterElement.style.display = troubleshooterElement.style.display === 'none' ? 'block' : 'none';
+            
+            updateDebugInfo();
+        }
+    });
+    
+    function updateDebugInfo() {
+        const debugElement = document.getElementById('debug');
+        if (debugElement.style.display === 'none') return;
+        
+        // Get current user
+        const user = firebase.auth().currentUser;
+        
+        let debugInfo = "=== AUTHENTICATION DEBUG INFO ===\n\n";
+        
+        // Auth state
+        debugInfo += "Current Auth State:\n";
+        debugInfo += user ? `User: ${user.email} (${user.uid})\n` : "No user signed in\n";
+        
+        // localStorage
+        debugInfo += "\nLocalStorage:\n";
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            debugInfo += `${key}: ${localStorage.getItem(key)}\n`;
+        }
+        
+        // Firebase SDK version
+        debugInfo += "\nFirebase SDK:\n";
+        debugInfo += `Version: ${firebase.SDK_VERSION}\n`;
+        
+        debugElement.textContent = debugInfo;
+    }
+    
+    // Troubleshooter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkEmailBtn = document.getElementById('check-email-btn');
+        const checkAuthBtn = document.getElementById('check-auth-btn');
+        const listDbUsersBtn = document.getElementById('list-db-users-btn');
+        const resetLocalStorageBtn = document.getElementById('reset-local-storage-btn');
+        
+        // Check email in database
+        checkEmailBtn.addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter an email address first');
+                return;
+            }
+            
+            const debugElement = document.getElementById('debug');
+            debugElement.style.display = 'block';
+            debugElement.textContent = "Checking database for email: " + email + "...";
+            
+            // Check Firebase Auth
+            firebase.auth().fetchSignInMethodsForEmail(email)
+                .then(methods => {
+                    let debugInfo = `=== EMAIL CHECK: ${email} ===\n\n`;
+                    debugInfo += `Auth Methods Available: ${methods.length ? methods.join(', ') : 'None'}\n\n`;
+                    
+                    // Check Realtime Database
+                    return firebase.database().ref('users').orderByChild('email').equalTo(email).once('value')
+                        .then(snapshot => {
+                            if (snapshot.exists()) {
+                                debugInfo += "✅ Email found in Database!\n\n";
+                                snapshot.forEach(childSnapshot => {
+                                    const userData = childSnapshot.val();
+                                    debugInfo += `User ID: ${childSnapshot.key}\n`;
+                                    debugInfo += `Name: ${userData.name || 'N/A'}\n`;
+                                    debugInfo += `Role: ${userData.role || 'user'}\n`;
+                                    debugInfo += `Auth Method: ${userData.authMethod || 'N/A'}\n`;
+                                    debugInfo += `Created: ${new Date(userData.createdAt).toLocaleString()}\n`;
+                                });
+                            } else {
+                                debugInfo += "❌ Email NOT found in Database\n";
+                            }
+                            
+                            debugElement.textContent = debugInfo;
+                        });
+                })
+                .catch(error => {
+                    debugElement.textContent = `Error checking email: ${error.message}`;
+                });
+        });
+        
+        // Check current auth state
+        checkAuthBtn.addEventListener('click', function() {
+            updateDebugInfo();
+        });
+        
+        // List database users
+        listDbUsersBtn.addEventListener('click', function() {
+            const debugElement = document.getElementById('debug');
+            debugElement.style.display = 'block';
+            debugElement.textContent = "Loading users from database...";
+            
+            firebase.database().ref('users').limitToLast(10).once('value')
+                .then(snapshot => {
+                    let debugInfo = "=== RECENT DATABASE USERS ===\n\n";
+                    
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const userData = childSnapshot.val();
+                            debugInfo += `Email: ${userData.email}\n`;
+                            debugInfo += `Name: ${userData.name || 'N/A'}\n`;
+                            debugInfo += `Role: ${userData.role || 'user'}\n`;
+                            debugInfo += `Last Login: ${userData.lastLogin ? new Date(userData.lastLogin).toLocaleString() : 'Never'}\n\n`;
+                        });
+                    } else {
+                        debugInfo += "No users found in database.";
+                    }
+                    
+                    debugElement.textContent = debugInfo;
+                })
+                .catch(error => {
+                    debugElement.textContent = `Error loading users: ${error.message}`;
+                });
+        });
+        
+        // Reset localStorage
+        resetLocalStorageBtn.addEventListener('click', function() {
+            if (confirm('This will clear all local authentication data. Continue?')) {
+                localStorage.clear();
+                updateDebugInfo();
+                alert('Local storage cleared.');
+            }
+        });
+    });
+</script>
 
 </body> 
 </html>

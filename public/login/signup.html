@@ -4,19 +4,134 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <link rel="stylesheet" href="signupstyle.css">
+    <!-- Try multiple CSS paths to ensure at least one works -->
+    <link rel="stylesheet" href="signupstyle.css?v=1.0">
+    <link rel="stylesheet" href="./signupstyle.css?v=1.0">
+    <link rel="stylesheet" href="/public/login/signupstyle.css?v=1.0">
+    <link rel="stylesheet" href="../login/signupstyle.css?v=1.0">
+    
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Embed critical CSS directly in the page -->
     <style>
-        /* Fix for error JSON display */
-        body > *:not(.container):not(#statusContainer):not(script):not(style) {
-            display: none !important;
+        /* Essential styles from signupstyle.css */
+        body {
+          background-color: #171f2e;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          padding: 0;
+          font-family: system-ui, -apple-system, sans-serif;
         }
         
-        /* Hide any error elements */
-        .error-json, pre, code {
-            display: none !important;
+        .container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          text-align: center;
+          width: 100%;
+          max-width: 500px;
+          padding: 20px;
+          margin: 0 auto;
+        }
+        
+        .form_area {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          background-color: #374151;
+          height: auto;
+          width: 100%;
+          padding: 25px;
+          border: 2px solid #264143;
+          border-radius: 15px;
+          box-shadow: 3px 4px 0px 1px #3b82f6;
+        }
+        
+        .title {
+          color: white;
+          font-weight: 900;
+          font-size: 1.8em;
+          margin: 15px 0;
+          line-height: 1.2;
+        }
+        
+        .sub_title {
+          color: white;
+          font-weight: 600;
+          margin: 5px 0;
+          font-size: 15px;
+        }
+        
+        .form_group {
+          display: flex;
+          flex-direction: column;
+          align-items: baseline;
+          margin: 12px 0;
+          width: 90%;
+        }
+        
+        form {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        
+        .form_style {
+          outline: none;
+          border: 2px solid #264143;
+          box-shadow: 3px 4px 0px 1px #3b82f6;
+          width: 100%;
+          padding: 14px;
+          border-radius: 4px;
+          font-size: 15px;
+          box-sizing: border-box;
+          background-color: #1f2937;
+          color: white;
+        }
+        
+        .form_style::placeholder {
+          color: #9ca3af;
+        }
+        
+        .btn {
+          padding: 16px;
+          margin: 25px 0;
+          width: 90%;
+          font-size: 17px;
+          background: #3b82f6;
+          border-radius: 10px;
+          font-weight: 800;
+          box-shadow: 3px 3px 0px 0px white;
+          cursor: pointer;
+          color: white;
+          border: none;
+          transition: all 0.3s ease;
+        }
+        
+        .link {
+          font-weight: 800;
+          color: #3b82f6;
+          padding: 5px;
+          text-decoration: none;
+          font-size: 15px;
+        }
+        
+        p {
+          color: white;
+          font-size: 15px;
+          line-height: 1.5;
+        }
+        
+        /* Test CSS for debugging - should make the body pink if CSS is working */
+        .test-active {
+            outline: 5px solid yellow !important;
         }
         
         /* Additional styling for admin form elements */
@@ -79,16 +194,24 @@
         
         // Clean up any error messages
         window.addEventListener('DOMContentLoaded', function() {
+            // Add the test class to body after a delay to check if styles are applied
             setTimeout(function() {
-                document.querySelectorAll('*').forEach(el => {
-                    if (el.innerText && typeof el.innerText === 'string' && 
-                        el.innerText.includes('CONFIGURATION_NOT_FOUND') && 
-                        !['DIV', 'FORM', 'BODY', 'HTML'].includes(el.tagName)) {
-                        el.style.display = 'none';
-                        el.innerHTML = '';
-                    }
-                });
-            }, 100);
+                document.body.classList.add('test-active');
+                console.log("Added test-active class to body");
+            }, 500);
+            
+            // Debug to check CSS loading
+            console.log("Document loaded. Checking CSS:");
+            const styles = document.styleSheets;
+            for (let i = 0; i < styles.length; i++) {
+                try {
+                    const href = styles[i].href || 'inline stylesheet';
+                    console.log(`Stylesheet ${i}: ${href}`);
+                    console.log(`  Loaded: ${!styles[i].disabled}`);
+                } catch (e) {
+                    console.log(`Stylesheet ${i}: Unable to access (probably CORS)`);
+                }
+            }
         });
     </script>
     
@@ -102,24 +225,32 @@
         <form action="">
             <div class="form_group">
                 <label class="sub_title" for="name">Name</label>
-                <input placeholder="Enter your full name" id="name" class="form_style" type="text" required>
+                <input placeholder="Enter your name" id="name" class="form_style" type="text">
             </div>
             <div class="form_group">
                 <label class="sub_title" for="email">Email</label>
-                <input placeholder="Enter your email" id="email" class="form_style" type="email" required>
+                <input placeholder="Enter your email" id="email" class="form_style" type="email">
             </div>
             <div class="form_group">
                 <label class="sub_title" for="password">Password</label>
-                <input placeholder="Enter your password" id="password" class="form_style" type="password" required>
-                <small class="hint">Password must contain at least 8 characters with uppercase, lowercase, number, and special character</small>
+                <input placeholder="Enter your password" id="password" class="form_style" type="password">
             </div>
             <div class="form_group">
                 <label class="sub_title" for="confirmPassword">Confirm Password</label>
-                <input placeholder="Confirm your password" id="confirmPassword" class="form_style" type="password" required>
+                <input placeholder="Confirm your password" id="confirmPassword" class="form_style" type="password">
             </div>
+            <!-- Admin check wrapper will be added here by JavaScript -->
+            <!-- Admin code wrapper will be added here by JavaScript -->
             <div>
                 <button class="btn">SIGN UP</button>
-                <p>Have an Account? <a class="link" href="login.html">Login Here!</a></p>
+                <p>Already Have an Account? <a class="link" href="login.html">Login</a></p>
+                <p><a class="link" href="admin-login.html">ADMIN LOGIN?</a></p>
+                <p><a class="link" href="../Email/email.html">OTP LOGIN?</a></p>
+                
+                <!-- CSS Diagnostic Button -->
+                <button type="button" id="css-diagnostic-btn" style="background-color: #333; color: white; border: none; padding: 5px 10px; margin-top: 15px; border-radius: 4px; cursor: pointer; font-size: 12px; display: none;">
+                    Test CSS Loading
+                </button>
             </div>
         </form>
     </div>
@@ -127,6 +258,169 @@
 
 <!-- Status message container -->
 <div id="statusContainer" class="status-container"></div>
+
+<!-- Debug info panel - click to toggle -->
+<div id="debug-panel" style="position:fixed; bottom:10px; left:10px; padding:10px; background:#000; color:#fff; cursor:pointer; z-index:9999; font-size:12px;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none';">
+    🔧 Debug CSS
+</div>
+<div style="display:none; position:fixed; bottom:40px; left:10px; width:300px; height:200px; overflow:auto; padding:10px; background:#222; color:#0f0; z-index:9999; border:1px solid #444; font-family:monospace; font-size:12px;">
+    <div>CSS Debug Info:</div>
+    <div id="css-debug"></div>
+    <hr>
+    <button onclick="reloadStyles()">Reload CSS</button>
+    <button onclick="addInlineStyles()">Add Inline Styles</button>
+    <script>
+        function populateDebugInfo() {
+            const debugDiv = document.getElementById('css-debug');
+            const styles = document.styleSheets;
+            let debugText = '';
+            
+            for (let i = 0; i < styles.length; i++) {
+                try {
+                    const href = styles[i].href || 'inline stylesheet';
+                    const state = styles[i].disabled ? 'DISABLED' : 'ACTIVE';
+                    debugText += `<div>Sheet ${i}: ${href.split('/').pop()}</div>`;
+                    debugText += `<div>Status: ${state}</div>`;
+                } catch (e) {
+                    debugText += `<div>Sheet ${i}: CORS issue</div>`;
+                }
+            }
+            
+            const computedStyle = window.getComputedStyle(document.body);
+            debugText += `<div>Body Bg: ${computedStyle.backgroundColor}</div>`;
+            
+            debugDiv.innerHTML = debugText;
+        }
+        
+        function reloadStyles() {
+            const links = document.querySelectorAll('link[rel="stylesheet"]');
+            links.forEach(link => {
+                const url = link.getAttribute('href');
+                link.setAttribute('href', url + '?t=' + new Date().getTime());
+            });
+            setTimeout(populateDebugInfo, 500);
+        }
+        
+        function addInlineStyles() {
+            const style = document.createElement('style');
+            style.textContent = `
+                body { background-color: #ff5722 !important; }
+                .form_area { background-color: #333 !important; border: 3px solid #ff0 !important; }
+                .title { color: #ff0 !important; }
+            `;
+            document.head.appendChild(style);
+            populateDebugInfo();
+        }
+        
+        document.addEventListener('DOMContentLoaded', populateDebugInfo);
+    </script>
+</div>
+
+<script>
+    // Show CSS diagnostic button with Shift+C
+    document.addEventListener('keydown', function(e) {
+        if (e.shiftKey && e.key === 'C') {
+            const diagnosticBtn = document.getElementById('css-diagnostic-btn');
+            diagnosticBtn.style.display = diagnosticBtn.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+    
+    // CSS diagnostic button functionality
+    document.getElementById('css-diagnostic-btn').addEventListener('click', function() {
+        // Create a diagnostic report
+        let report = "CSS Loading Diagnostic Report\n\n";
+        report += "Time: " + new Date().toLocaleString() + "\n";
+        report += "URL: " + window.location.href + "\n\n";
+        
+        // Check all stylesheets
+        report += "Stylesheet Status:\n";
+        const styles = document.querySelectorAll('link[rel="stylesheet"]');
+        styles.forEach(styleSheet => {
+            report += `${styleSheet.href || 'inline style'}: ${styleSheet.sheet ? 'LOADED' : 'FAILED'}\n`;
+            
+            // Try to fetch the CSS directly
+            if (styleSheet.href && !styleSheet.href.startsWith('data:')) {
+                fetch(styleSheet.href)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`CSS fetch successful: ${styleSheet.href}`);
+                            return response.text();
+                        } else {
+                            console.error(`CSS fetch failed with status ${response.status}: ${styleSheet.href}`);
+                            throw new Error(`Status ${response.status}`);
+                        }
+                    })
+                    .then(cssText => {
+                        console.log(`CSS content length: ${cssText.length} bytes`);
+                        // Create a download link for the CSS
+                        const cssFileName = styleSheet.href.split('/').pop();
+                        const blob = new Blob([cssText], {type: 'text/css'});
+                        const cssUrl = URL.createObjectURL(blob);
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = cssUrl;
+                        downloadLink.download = cssFileName || 'style.css';
+                        downloadLink.textContent = `Download ${cssFileName || 'CSS file'}`;
+                        downloadLink.style.display = 'block';
+                        downloadLink.style.marginTop = '5px';
+                        downloadLink.style.color = '#3b82f6';
+                        document.getElementById('css-diagnostic-btn').parentNode.appendChild(downloadLink);
+                    })
+                    .catch(error => {
+                        console.error(`CSS fetch error: ${error}`, styleSheet.href);
+                    });
+            }
+        });
+        
+        // Computed styles
+        report += "\nComputed Styles:\n";
+        report += `Body background: ${window.getComputedStyle(document.body).backgroundColor}\n`;
+        report += `Body color: ${window.getComputedStyle(document.body).color}\n`;
+        report += `Form background: ${window.getComputedStyle(document.querySelector('.form_area')).backgroundColor}\n`;
+        
+        // Create a log element
+        const logElement = document.createElement('pre');
+        logElement.textContent = report;
+        logElement.style.backgroundColor = '#f8f9fa';
+        logElement.style.color = '#212529';
+        logElement.style.padding = '15px';
+        logElement.style.marginTop = '15px';
+        logElement.style.borderRadius = '4px';
+        logElement.style.whiteSpace = 'pre-wrap';
+        logElement.style.wordBreak = 'break-all';
+        logElement.style.maxHeight = '300px';
+        logElement.style.overflowY = 'auto';
+        logElement.style.fontSize = '12px';
+        logElement.style.fontFamily = 'monospace';
+        
+        // Add to the page
+        this.parentNode.appendChild(logElement);
+        
+        // Create download report button
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = 'Download Report';
+        downloadBtn.style.backgroundColor = '#3b82f6';
+        downloadBtn.style.color = 'white';
+        downloadBtn.style.border = 'none';
+        downloadBtn.style.padding = '5px 10px';
+        downloadBtn.style.marginTop = '10px';
+        downloadBtn.style.borderRadius = '4px';
+        downloadBtn.style.cursor = 'pointer';
+        downloadBtn.style.fontSize = '12px';
+        
+        downloadBtn.addEventListener('click', function() {
+            const blob = new Blob([report], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'css-diagnostic-report.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+        
+        this.parentNode.appendChild(downloadBtn);
+    });
+</script>
 
 </body>
 </html>

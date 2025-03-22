@@ -4,7 +4,66 @@ AOS.init({
     once: true
 });
 
+// Add pagination variables at the top of the file
+let currentPage = 1;
+const documentsPerPage = 10;
+let totalDocumentPages = 1;
+
+// Add CSS for IPFS button pulse animation
 document.addEventListener('DOMContentLoaded', function() {
+    // Add the pulse animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+            }
+        }
+        
+        .ipfs-hash-container {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .ipfs-label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #9ca3af;
+        }
+        
+        .ipfs-hash-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-family: monospace;
+            display: inline-flex;
+            align-items: center;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .ipfs-hash-link i {
+            margin-right: 5px;
+        }
+        
+        .ipfs-hash-link:hover {
+            text-decoration: underline;
+        }
+    `;
+    document.head.appendChild(style);
+    
     console.log('Admin dashboard loaded');
     initializeAdminDashboard();
     
@@ -615,8 +674,59 @@ function loadDocuments() {
                 
                 console.log(`Loaded ${documents.length} documents from Firebase`);
                 
-                // Save to localStorage for faster access
-                localStorage.setItem('adminDocuments', JSON.stringify(documents));
+                // Save a lighter version to localStorage for faster access
+                try {
+                    // Create a lightweight version by removing large file content
+                    const lightDocuments = documents.map(doc => {
+                        // Create a shallow copy of the document
+                        const lightDoc = { ...doc };
+                        
+                        // Remove large file content if it exists
+                        if (lightDoc.fileDetails && lightDoc.fileDetails.fileContent) {
+                            // Save file name and type but not the content
+                            lightDoc.fileDetails = {
+                                fileName: lightDoc.fileDetails.fileName,
+                                fileType: lightDoc.fileDetails.fileType,
+                                fileSize: lightDoc.fileDetails.fileSize,
+                                hasContent: true // Flag to indicate content exists in Firebase
+                            };
+                        }
+                        
+                        return lightDoc;
+                    });
+                    
+                    // Store the lighter version in localStorage
+                    localStorage.setItem('adminDocuments', JSON.stringify(lightDocuments));
+                    
+                    // Store documents in memory for the current session
+                    window.adminDocuments = documents;
+                } catch (storageError) {
+                    console.error('Error saving to localStorage:', storageError);
+                    
+                    // If we hit storage limit, try storing even less data
+                    try {
+                        // Create an ultra light version with minimal data
+                        const minimalDocuments = documents.map(doc => ({
+                            id: doc.id,
+                            status: doc.status,
+                            createdAt: doc.createdAt,
+                            service: doc.service,
+                            userDetails: doc.userDetails ? {
+                                name: doc.userDetails.name,
+                                dob: doc.userDetails.dob
+                            } : null,
+                            hasDetails: true // Flag to indicate more details exist in Firebase
+                        }));
+                        
+                        localStorage.setItem('adminDocuments', JSON.stringify(minimalDocuments));
+                    } catch (e) {
+                        console.error('Still cannot save to localStorage:', e);
+                        showToast('Warning: Documents too large for local storage', 'warning');
+                    }
+                    
+                    // Keep full documents in memory
+                    window.adminDocuments = documents;
+                }
                 
                 // Display the documents
                 displayDocuments(documents);
@@ -626,16 +736,26 @@ function loadDocuments() {
                 showToast('Error loading documents: ' + error.message, 'error');
                 
                 // Try to load from localStorage as fallback
-                const cachedDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
-                displayDocuments(cachedDocuments);
+                try {
+                    const cachedDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+                    displayDocuments(cachedDocuments);
+                } catch (parseError) {
+                    console.error('Error parsing cached documents:', parseError);
+                    displayDocuments([]);
+                }
             });
     } else {
         console.error('Firebase database not initialized');
         showToast('Firebase database not initialized', 'error');
         
         // Try to load from localStorage as fallback
-        const cachedDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
-        displayDocuments(cachedDocuments);
+        try {
+            const cachedDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+            displayDocuments(cachedDocuments);
+        } catch (parseError) {
+            console.error('Error parsing cached documents:', parseError);
+            displayDocuments([]);
+        }
     }
 }
 
@@ -643,17 +763,73 @@ function filterDocuments() {
     const searchTerm = document.getElementById('documentSearch').value.toLowerCase();
     const statusFilter = document.getElementById('statusFilter').value;
     
-    let documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+    // Reset pagination to first page
+    currentPage = 1;
     
-    const filteredDocs = documents.filter(doc => {
-        const matchesSearch = doc.panData.name.toLowerCase().includes(searchTerm) ||
-                            doc.fileName.toLowerCase().includes(searchTerm);
-        const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+    // Get full document list from memory
+    const allDocuments = window.adminDocuments || [];
+    
+    // If we don't have documents in memory, try loading from localStorage
+    if (allDocuments.length === 0) {
+        try {
+            const cachedDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+            if (cachedDocuments.length > 0) {
+                window.adminDocuments = cachedDocuments;
+            }
+        } catch (error) {
+            console.error('Error parsing documents from localStorage:', error);
+        }
+    }
+    
+    // Apply filters to the full list
+    let filteredDocuments = allDocuments.filter(doc => {
+        // Search term filter
+        const matchesSearch = searchTerm === '' || 
+            (doc.userDetails?.name && doc.userDetails.name.toLowerCase().includes(searchTerm)) ||
+            (doc.userDetails?.email && doc.userDetails.email.toLowerCase().includes(searchTerm)) ||
+            (doc.walletAddress && doc.walletAddress.toLowerCase().includes(searchTerm)) ||
+            (doc.fileDetails?.fileName && doc.fileDetails.fileName.toLowerCase().includes(searchTerm)) ||
+            (doc.service && doc.service.toLowerCase().includes(searchTerm)) ||
+            (doc.panNumber && doc.panNumber.toLowerCase().includes(searchTerm));
+        
+        // Status filter
+        const matchesStatus = statusFilter === 'all' || 
+            (doc.status && doc.status.toLowerCase() === statusFilter.toLowerCase());
         
         return matchesSearch && matchesStatus;
     });
     
-    displayDocuments(filteredDocs);
+    // Display filtered documents
+    displayDocuments(filteredDocuments);
+    
+    // Show message if no results
+    if (filteredDocuments.length === 0) {
+        const documentsGrid = document.querySelector('.documents-grid');
+        documentsGrid.innerHTML = `
+            <div class="no-documents">
+                <i class="fas fa-search"></i>
+                <p>No documents match your search criteria</p>
+                <button class="reset-filter-btn" onclick="resetFilters()">Reset Filters</button>
+            </div>
+        `;
+    }
+}
+
+// Function to reset filters
+function resetFilters() {
+    // Clear search and reset filter
+    document.getElementById('documentSearch').value = '';
+    document.getElementById('statusFilter').value = 'all';
+    
+    // Reset page
+    currentPage = 1;
+    
+    // Reload documents
+    if (window.adminDocuments && window.adminDocuments.length > 0) {
+        displayDocuments(window.adminDocuments);
+    } else {
+        loadDocuments();
+    }
 }
 
 function displayDocuments(documents) {
@@ -669,16 +845,99 @@ function displayDocuments(documents) {
         return;
     }
     
+    // Store documents in a global variable for easy access if not already stored
+    if (!window.adminDocuments) {
+        window.adminDocuments = documents;
+    }
+    
+    // Calculate pagination
+    totalDocumentPages = Math.ceil(documents.length / documentsPerPage);
+    
+    // Get current page documents
+    const startIndex = (currentPage - 1) * documentsPerPage;
+    const endIndex = Math.min(startIndex + documentsPerPage, documents.length);
+    const currentPageDocuments = documents.slice(startIndex, endIndex);
+    
+    // Clear the grid
     documentsGrid.innerHTML = '';
-    documents.forEach((doc, index) => {
-        const card = createDocumentCard(doc, index);
+    
+    // Create document cards for current page
+    currentPageDocuments.forEach((doc, index) => {
+        // The actual index in the full array
+        const globalIndex = startIndex + index;
+        const card = createDocumentCard(doc, globalIndex);
         documentsGrid.appendChild(card);
+    });
+    
+    // Add pagination controls
+    addDocumentPagination(documents.length);
+    
+    // Add event listeners to buttons after adding cards to DOM
+    attachDocumentCardListeners();
+}
+
+// New function to attach event listeners to document card buttons
+function attachDocumentCardListeners() {
+    // Use event delegation - attach one listener to the documents grid
+    const documentsGrid = document.querySelector('.documents-grid');
+    if (!documentsGrid) return;
+    
+    // Remove any existing event listeners by cloning and replacing
+    const newGrid = documentsGrid.cloneNode(true);
+    documentsGrid.parentNode.replaceChild(newGrid, documentsGrid);
+    
+    // Add a single event listener for all button clicks
+    newGrid.addEventListener('click', function(e) {
+        // Find the closest button to the click target
+        const button = e.target.closest('button');
+        if (!button) return;
+        
+        // Get the action type from data attribute
+        const action = button.getAttribute('data-action');
+        if (!action) return;
+        
+        // Find the parent card and get the document index
+        const card = button.closest('.document-card');
+        if (!card) return;
+        
+        const index = parseInt(card.dataset.documentIndex);
+        if (isNaN(index)) return;
+        
+        // Prevent default and stop propagation
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Call the appropriate function based on action type
+        switch (action) {
+            case 'view':
+                viewDocument(index);
+                break;
+            case 'ipfs':
+                if (!button.disabled) {
+                    uploadToIPFS(index);
+                }
+                break;
+            case 'approve':
+                if (!button.disabled) {
+                    approveDocument(index);
+                }
+                break;
+            case 'reject':
+                if (!button.disabled) {
+                    rejectDocument(index);
+                }
+                break;
+            case 'push':
+                pushToUser(index);
+                break;
+        }
     });
 }
 
 function createDocumentCard(doc, index) {
     const card = document.createElement('div');
     card.className = 'document-card';
+    card.dataset.documentIndex = index; // Store index as data attribute for easier access
     
     // Determine status class
     const statusClass = doc.status ? doc.status.toLowerCase().replace(' ', '-') : 'pending';
@@ -708,7 +967,7 @@ function createDocumentCard(doc, index) {
         <div class="user-info">
             <div class="flex justify-between items-center">
                 <h3>${userName}</h3>
-                <button onclick="pushToUser(${index})" class="push-btn">
+                <button class="push-btn" data-action="push">
                     <i class="fas fa-paper-plane"></i> Push to User
                 </button>
             </div>
@@ -741,16 +1000,16 @@ function createDocumentCard(doc, index) {
         </div>
         
         <div class="document-actions-footer">
-            <button onclick="viewDocument(${index})" class="view-btn">
+            <button class="view-btn" data-action="view">
                 <i class="fas fa-eye"></i> View
             </button>
-            <button onclick="uploadToIPFS(${index})" class="ipfs-btn" ${doc.ipfsHash ? 'disabled' : ''}>
+            <button class="ipfs-btn" data-action="ipfs" ${doc.ipfsHash ? 'disabled' : ''}>
                 <i class="fas fa-cloud-upload-alt"></i> IPFS
             </button>
-            <button onclick="approveDocument(${index})" class="approve-btn" ${doc.status === 'Approved' ? 'disabled' : ''}>
+            <button class="approve-btn" data-action="approve" ${doc.status === 'Approved' ? 'disabled' : ''}>
                 <i class="fas fa-check"></i> Approve
             </button>
-            <button onclick="rejectDocument(${index})" class="reject-btn" ${doc.status === 'Rejected' ? 'disabled' : ''}>
+            <button class="reject-btn" data-action="reject" ${doc.status === 'Rejected' ? 'disabled' : ''}>
                 <i class="fas fa-times"></i> Reject
             </button>
         </div>
@@ -769,36 +1028,50 @@ function createDocumentCard(doc, index) {
     return card;
 }
 
-function viewDocument(index) {
-    const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
-    const doc = documents[index];
+async function uploadToIPFS(index) {
+    // Get the document card based on the document index
+    const documentCards = document.querySelectorAll('.document-card');
+    let card = null;
     
-    if (!doc) {
-        showToast('Document not found', 'error');
+    // Find the card with the matching data-document-index attribute
+    for (const docCard of documentCards) {
+        if (parseInt(docCard.dataset.documentIndex) === index) {
+            card = docCard;
+            break;
+        }
+    }
+    
+    // If we can't find the card by data attribute, fall back to nth-child
+    if (!card) {
+        // This might not be accurate with pagination, but keeping as fallback
+        const displayedIndex = index % documentsPerPage;
+        card = document.querySelector(`.documents-grid .document-card:nth-child(${displayedIndex + 1})`);
+    }
+    
+    // If we still don't have a card, try to find the IPFS button itself
+    if (!card) {
+        const buttons = document.querySelectorAll('.ipfs-btn');
+        buttons.forEach(btn => {
+            const onclickAttr = btn.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes(`uploadToIPFS(${index})`)) {
+                card = btn.closest('.document-card');
+            }
+        });
+    }
+    
+    if (!card) {
+        console.error('Could not find document card for index:', index);
+        showToast('Error: Could not find document card', 'error');
         return;
     }
     
-    // Check if we have file content to display
-    if (doc.fileDetails && doc.fileDetails.fileContent) {
-        // Open file content in new tab
-        const win = window.open();
-        win.document.write(`
-            <iframe src="${doc.fileDetails.fileContent}" frameborder="0" 
-            style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" 
-            allowfullscreen></iframe>
-        `);
-    } else if (doc.fileDetails && doc.fileDetails.storageIssue) {
-        // Show storage issue message
-        showToast('Cannot display file: ' + doc.fileDetails.storageIssue, 'error');
-    } else {
-        // No file content available
-        showToast('File content not available. File may be too large or not properly stored.', 'error');
+    const button = card.querySelector('.ipfs-btn');
+    if (!button) {
+        console.error('Could not find IPFS button in card:', card);
+        showToast('Error: Could not find IPFS button', 'error');
+        return;
     }
-}
-
-async function uploadToIPFS(index) {
-    const button = document.querySelector(`.documents-grid .document-card:nth-child(${index + 1}) .ipfs-btn`);
-    const card = button.closest('.document-card');
+    
     const originalText = button.innerHTML;
     
     try {
@@ -817,12 +1090,75 @@ async function uploadToIPFS(index) {
         `;
         card.appendChild(progressContainer);
 
-        // Get the documents from localStorage
-        const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+        // Get the documents from memory or localStorage
+        const documents = window.adminDocuments || JSON.parse(localStorage.getItem('adminDocuments') || '[]');
         const doc = documents[index];
 
         if (!doc) {
             throw new Error('Document not found');
+        }
+        
+        // If document already has IPFS hash, show it
+        if (doc.ipfsHash) {
+            progressContainer.querySelector('.progress-text').textContent = 'Already on IPFS!';
+            progressContainer.querySelector('.progress-fill').style.width = '100%';
+            
+            // Just update UI to show IPFS hash
+            setTimeout(() => {
+                showToast(`Document already on IPFS: ${doc.ipfsHash}`, 'info');
+                const newCard = createDocumentCard(doc, index);
+                card.replaceWith(newCard);
+                // Reattach event listeners for the new card
+                attachDocumentCardListeners();
+            }, 1000);
+            
+            return;
+        }
+
+        // Check Firebase first - maybe the document has an IPFS hash there
+        if (doc.id && firebase) {
+            try {
+                const snapshot = await firebase.database().ref(`userDocuments/${doc.id}`).once('value');
+                const firebaseDoc = snapshot.val();
+                
+                if (firebaseDoc && firebaseDoc.ipfsHash) {
+                    // Document already has IPFS hash in Firebase
+                    doc.ipfsHash = firebaseDoc.ipfsHash;
+                    
+                    // Update in memory
+                    if (window.adminDocuments && window.adminDocuments[index]) {
+                        window.adminDocuments[index].ipfsHash = doc.ipfsHash;
+                    }
+                    
+                    // Update localStorage
+                    try {
+                        const lightDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+                        if (lightDocuments[index]) {
+                            lightDocuments[index].ipfsHash = doc.ipfsHash;
+                            localStorage.setItem('adminDocuments', JSON.stringify(lightDocuments));
+                        }
+                    } catch (storageError) {
+                        console.warn('Could not update localStorage:', storageError);
+                    }
+                    
+                    progressContainer.querySelector('.progress-text').textContent = 'Already on IPFS!';
+                    progressContainer.querySelector('.progress-fill').style.width = '100%';
+                    
+                    // Update UI
+                    setTimeout(() => {
+                        showToast(`Document already on IPFS: ${doc.ipfsHash}`, 'info');
+                        const newCard = createDocumentCard(doc, index);
+                        card.replaceWith(newCard);
+                        // Reattach event listeners for the new card
+                        attachDocumentCardListeners();
+                    }, 1000);
+                    
+                    return;
+                }
+            } catch (firebaseError) {
+                console.warn('Error checking Firebase for IPFS hash:', firebaseError);
+                // Continue with upload, don't throw
+            }
         }
 
         // Get file details from correct location
@@ -875,7 +1211,12 @@ async function uploadToIPFS(index) {
         console.log('IPFS upload result:', result.data);
 
         // Update the document with IPFS hash
-        documents[index].ipfsHash = result.data.IpfsHash;
+        doc.ipfsHash = result.data.IpfsHash;
+        
+        // Update in memory
+        if (window.adminDocuments && window.adminDocuments[index]) {
+            window.adminDocuments[index].ipfsHash = doc.ipfsHash;
+        }
         
         // Update Firebase if we have an ID
         if (doc.id && window.firebase) {
@@ -885,12 +1226,22 @@ async function uploadToIPFS(index) {
                     // Get the document reference
                     const docRef = doc.id.includes('/') ? doc.id : 'userDocuments/' + doc.id;
                     
-                    // Update the document with IPFS hash
+                    // Get existing document to merge updates correctly
+                    const snapshot = await firebaseDb.ref(docRef).once('value');
+                    const existingDoc = snapshot.val() || {};
+                    
+                    // Create updated fileDetails object properly
+                    const fileDetails = existingDoc.fileDetails || {};
+                    fileDetails.ipfsHash = result.data.IpfsHash;
+                    fileDetails.ipfsUrl = `https://ipfs.io/ipfs/${result.data.IpfsHash}`;
+                    
+                    // Update the document with IPFS hash at both levels
                     await firebaseDb.ref(docRef).update({
-                        ipfsHash: result.data.IpfsHash,
-                        'fileDetails.ipfsHash': result.data.IpfsHash,
-                        'fileDetails.ipfsUrl': `https://ipfs.io/ipfs/${result.data.IpfsHash}`
+                        ipfsHash: result.data.IpfsHash, // Root level hash
+                        ipfsUrl: `https://ipfs.io/ipfs/${result.data.IpfsHash}`, // Root level URL
+                        fileDetails: fileDetails // Updated fileDetails object with IPFS info
                     });
+                    
                     console.log('Updated Firebase with IPFS hash:', result.data.IpfsHash);
                 }
             } catch (firebaseError) {
@@ -899,7 +1250,15 @@ async function uploadToIPFS(index) {
         }
         
         // Save updated documents back to localStorage
-        localStorage.setItem('adminDocuments', JSON.stringify(documents));
+        try {
+            const lightDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+            if (lightDocuments[index]) {
+                lightDocuments[index].ipfsHash = doc.ipfsHash;
+                localStorage.setItem('adminDocuments', JSON.stringify(lightDocuments));
+            }
+        } catch (storageError) {
+            console.warn('Could not update localStorage:', storageError);
+        }
 
         // Show 100% completion
         progressContainer.querySelector('.progress-fill').style.width = '100%';
@@ -907,9 +1266,35 @@ async function uploadToIPFS(index) {
 
         // Refresh the card display after a short delay
         setTimeout(() => {
-            const newCard = createDocumentCard(documents[index], index);
+            const newCard = createDocumentCard(doc, index);
             card.replaceWith(newCard);
+            
+            // Reattach event listeners for the new card
+            attachDocumentCardListeners();
+            
+            // Add the IPFS view link to the card if it doesn't exist
+            const addedCard = Array.from(document.querySelectorAll('.document-card'))
+                .find(c => parseInt(c.dataset.documentIndex) === index);
+                
+            if (addedCard && !addedCard.querySelector('.ipfs-hash-container')) {
+                const ipfsContainer = document.createElement('div');
+                ipfsContainer.className = 'ipfs-hash-container';
+                ipfsContainer.innerHTML = `
+                    <p class="ipfs-label">IPFS Hash:</p>
+                    <a href="https://ipfs.io/ipfs/${doc.ipfsHash}" target="_blank" class="ipfs-hash-link">
+                        <i class="fas fa-external-link-alt"></i>
+                        ${doc.ipfsHash.slice(0, 20)}...${doc.ipfsHash.slice(-8)}
+                    </a>
+                `;
+                addedCard.appendChild(ipfsContainer);
+            }
+            
             showToast('Document uploaded to IPFS successfully!', 'success');
+            
+            // If the document is already approved, make sure it shows the IPFS hash
+            if (doc.status === 'Approved') {
+                showToast('Document is approved and now has IPFS link', 'success');
+            }
         }, 1000);
 
     } catch (error) {
@@ -928,47 +1313,9 @@ async function uploadToIPFS(index) {
     }
 }
 
-// Add this function to optimize images before upload
-async function optimizeImage(base64Data) {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-            
-            // Max dimension
-            const MAX_DIMENSION = 1200;
-            
-            // Scale down if image is too large
-            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
-                if (width > height) {
-                    height = Math.round((height * MAX_DIMENSION) / width);
-                    width = MAX_DIMENSION;
-                } else {
-                    width = Math.round((width * MAX_DIMENSION) / height);
-                    height = MAX_DIMENSION;
-                }
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            // Convert to blob with quality 0.8 for JPG
-            canvas.toBlob((blob) => {
-                resolve(blob);
-            }, 'image/jpeg', 0.8);
-        };
-        img.src = base64Data;
-    });
-}
-
-// Fix the approveDocument function to generate a real IPFS hash
 async function approveDocument(index) {
-    const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+    // Get documents from memory first, fall back to localStorage
+    const documents = window.adminDocuments || JSON.parse(localStorage.getItem('adminDocuments') || '[]');
     const doc = documents[index];
     
     if (!doc) {
@@ -976,98 +1323,78 @@ async function approveDocument(index) {
         return;
     }
     
+    // Update the document status
+    doc.status = 'Approved';
+    doc.approvedAt = new Date().toISOString();
+    
     try {
-        // Show loading toast
-        // showToast('Uploading document to IPFS and approving...', 'info');
-        
-        // First, upload to IPFS if not already uploaded
+        // If there's no IPFS hash yet, try to upload it first
         if (!doc.ipfsHash) {
-            // Get file details from correct location
-            const fileName = doc.fileDetails?.fileName || doc.fileName || 'document';
-            const fileData = doc.fileDetails?.fileContent || doc.fileData;
+            showToast('Document needs to be uploaded to IPFS first. Starting upload...', 'info');
             
-            if (!fileData) {
-                throw new Error('No file data available to upload');
+            try {
+                // We need to call uploadToIPFS but we can't directly await it
+                // Instead, mark the document as pending upload and let the user know
+                showToast('Please click the IPFS button to upload this document first', 'warning');
+                
+                // Update UI to highlight IPFS button - find by data attribute for better accuracy
+                const documentCard = Array.from(document.querySelectorAll('.document-card'))
+                    .find(card => parseInt(card.dataset.documentIndex) === index);
+                    
+                if (documentCard) {
+                    const ipfsBtn = documentCard.querySelector('.ipfs-btn');
+                    if (ipfsBtn) {
+                        ipfsBtn.style.animation = 'pulse 1.5s infinite';
+                        ipfsBtn.style.backgroundColor = '#f59e0b';
+                    }
+                }
+                
+                // Still proceed with approval
+            } catch (ipfsError) {
+                console.error('Error during IPFS upload:', ipfsError);
+                // Continue with approval process even if IPFS upload fails
             }
-
-            // Determine file type from the file name or default to application/octet-stream
-            const fileType = fileName.includes('.') ? 
-                `application/${fileName.split('.').pop().toLowerCase()}` : 
-                'application/octet-stream';
-
-            // Optimize file size before upload (if it's an image)
-            let file;
-            if (fileName.match(/\.(jpg|jpeg|png)$/i)) {
-                const optimizedBlob = await optimizeImage(fileData);
-                file = new File([optimizedBlob], fileName);
-            } else {
-                const response = await fetch(fileData);
-                const blob = await response.blob();
-                file = new File([blob], fileName, { type: fileType });
-            }
-
-            // Create form data
-            const formData = new FormData();
-            formData.append('file', file);
-
-            // Upload to IPFS via Pinata
-            console.log('Uploading to IPFS...');
-            const result = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'pinata_api_key': 'f06e5fd1f9bd46842319',
-                    'pinata_secret_api_key': '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
-                },
-                timeout: 30000 // 30 second timeout
-            });
-
-            console.log('IPFS upload result:', result.data);
-            
-            // Set the real IPFS hash
-            documents[index].ipfsHash = result.data.IpfsHash;
-            localStorage.setItem('adminDocuments', JSON.stringify(documents));
         }
         
-        // Now update status in localStorage
-        documents[index].status = 'Approved';
-        localStorage.setItem('adminDocuments', JSON.stringify(documents));
+        // Update in Firebase
+        await firebase.database().ref(`userDocuments/${doc.id}`).update({
+            status: doc.status,
+            approvedAt: doc.approvedAt
+        });
         
-        // Update status in Firebase
-        const firebaseDb = firebase.database();
-        if (firebaseDb && doc.id) {
-            // Create a new document object with updated values
-            const updatedDoc = {
-                status: 'Approved',
-                lastUpdated: new Date().getTime(),
-                ipfsHash: documents[index].ipfsHash // Use the real IPFS hash
-            };
+        showToast('Document approved successfully', 'success');
+        
+        // Update document in memory
+        if (window.adminDocuments) {
+            window.adminDocuments[index] = doc;
+        }
+        
+        // Try to update in localStorage (simplified version)
+        try {
+            const lightDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+            if (lightDocuments[index]) {
+                lightDocuments[index].status = doc.status;
+                lightDocuments[index].approvedAt = doc.approvedAt;
+                localStorage.setItem('adminDocuments', JSON.stringify(lightDocuments));
+            }
+        } catch (storageError) {
+            console.warn('Could not update localStorage:', storageError);
+        }
+        
+        // Update the UI by finding the card using data attribute
+        const documentCard = Array.from(document.querySelectorAll('.document-card'))
+            .find(card => parseInt(card.dataset.documentIndex) === index);
             
-            // Create a separate fileDetails object if it doesn't exist
-            firebaseDb.ref('userDocuments/' + doc.id).once('value')
-                .then((snapshot) => {
-                    const existingDoc = snapshot.val();
-                    const fileDetails = existingDoc.fileDetails || {};
-                    
-                    // Update the fileDetails with IPFS hash
-                    fileDetails.ipfsHash = documents[index].ipfsHash;
-                    fileDetails.ipfsUrl = `https://ipfs.io/ipfs/${documents[index].ipfsHash}`;
-                    
-                    // Update the whole document with new fileDetails
-                    return firebaseDb.ref('userDocuments/' + doc.id).update({
-                        ...updatedDoc,
-                        fileDetails: fileDetails
-                    });
-                })
-                .then(() => {
-                    showToast('Document approved and uploaded to IPFS successfully!', 'success');
-                    loadDocuments(); // Refresh the documents list
-                })
-                .catch(error => {
-                    console.error('Error updating Firebase:', error);
-                    showToast('Error updating Firebase: ' + error.message, 'error');
-                });
+        if (documentCard) {
+            // Create a new card with updated data
+            const newCard = createDocumentCard(doc, index);
+            documentCard.replaceWith(newCard);
+            
+            // Reattach event listeners for the new card
+            attachDocumentCardListeners();
         } else {
-            loadDocuments(); // Refresh the documents list
+            // If we can't find the card, refresh the whole document display
+            displayDocuments(window.adminDocuments);
         }
     } catch (error) {
         console.error('Error approving document:', error);
@@ -1076,7 +1403,7 @@ async function approveDocument(index) {
 }
 
 function rejectDocument(index) {
-    const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+    const documents = window.adminDocuments || JSON.parse(localStorage.getItem('adminDocuments') || '[]');
     const doc = documents[index];
     
     if (!doc) {
@@ -1085,25 +1412,73 @@ function rejectDocument(index) {
     }
     
     try {
-        // Update status in localStorage
-        documents[index].status = 'Rejected';
-        localStorage.setItem('adminDocuments', JSON.stringify(documents));
+        // Update status in memory and localStorage
+        doc.status = 'Rejected';
+        doc.rejectedAt = new Date().toISOString();
+        
+        // Update in memory
+        if (window.adminDocuments && window.adminDocuments[index]) {
+            window.adminDocuments[index].status = 'Rejected';
+            window.adminDocuments[index].rejectedAt = doc.rejectedAt;
+        }
+        
+        // Try to update in localStorage
+        try {
+            const lightDocuments = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+            if (lightDocuments[index]) {
+                lightDocuments[index].status = 'Rejected';
+                lightDocuments[index].rejectedAt = doc.rejectedAt;
+                localStorage.setItem('adminDocuments', JSON.stringify(lightDocuments));
+            }
+        } catch (storageError) {
+            console.warn('Could not update localStorage:', storageError);
+        }
         
         // Update status in Firebase
         const firebaseDb = firebase.database();
         if (firebaseDb && doc.id) {
             firebaseDb.ref('userDocuments/' + doc.id).update({
                 status: 'Rejected',
+                rejectedAt: doc.rejectedAt,
                 lastUpdated: new Date().getTime()
             }).then(() => {
                 showToast('Document rejected successfully!', 'success');
-                loadDocuments(); // Refresh the documents list
+                
+                // Update the UI by finding the card using data attribute
+                const documentCard = Array.from(document.querySelectorAll('.document-card'))
+                    .find(card => parseInt(card.dataset.documentIndex) === index);
+                
+                if (documentCard) {
+                    // Create a new card with updated data
+                    const newCard = createDocumentCard(doc, index);
+                    documentCard.replaceWith(newCard);
+                    
+                    // Reattach event listeners for the new card
+                    attachDocumentCardListeners();
+                } else {
+                    // If we can't find the card, refresh the whole document display
+                    displayDocuments(window.adminDocuments);
+                }
             }).catch(error => {
                 console.error('Error updating Firebase:', error);
                 showToast('Error updating Firebase: ' + error.message, 'error');
             });
         } else {
-            loadDocuments(); // Refresh the documents list
+            // Update UI without Firebase
+            const documentCard = Array.from(document.querySelectorAll('.document-card'))
+                .find(card => parseInt(card.dataset.documentIndex) === index);
+            
+            if (documentCard) {
+                // Create a new card with updated data
+                const newCard = createDocumentCard(doc, index);
+                documentCard.replaceWith(newCard);
+                
+                // Reattach event listeners for the new card
+                attachDocumentCardListeners();
+            } else {
+                // If we can't find the card, refresh the whole document display
+                displayDocuments(window.adminDocuments);
+            }
         }
     } catch (error) {
         console.error('Error rejecting document:', error);
@@ -1859,7 +2234,8 @@ function showToast(message, type = 'info') {
 // Add the pushToUser function
 async function pushToUser(index) {
     try {
-        const documents = JSON.parse(localStorage.getItem('adminDocuments') || '[]');
+        // Get documents from memory first, fall back to localStorage
+        const documents = window.adminDocuments || JSON.parse(localStorage.getItem('adminDocuments') || '[]');
         const doc = documents[index];
         
         if (!doc) {
@@ -1889,11 +2265,19 @@ async function pushToUser(index) {
         if (doc.status === 'Approved' && !doc.ipfsHash) {
             showToast('Generating IPFS hash before pushing...', 'info');
             
-            // Generate a mock IPFS hash if there's no real one
-            const mockHash = 'QmXn2PZvkAo7D99pxJ9z' + Math.random().toString(36).substring(2, 10);
-            documents[index].ipfsHash = mockHash;
-            localStorage.setItem('adminDocuments', JSON.stringify(documents));
-            doc.ipfsHash = mockHash;
+            // Find and highlight the IPFS button
+            const documentCard = Array.from(document.querySelectorAll('.document-card'))
+                .find(card => parseInt(card.dataset.documentIndex) === index);
+                
+            if (documentCard) {
+                const ipfsBtn = documentCard.querySelector('.ipfs-btn');
+                if (ipfsBtn) {
+                    ipfsBtn.style.animation = 'pulse 1.5s infinite';
+                    ipfsBtn.style.backgroundColor = '#f59e0b';
+                    showToast('Please click the highlighted IPFS button first', 'warning');
+                    return;
+                }
+            }
         }
         
         // Get reference to the document
@@ -1915,17 +2299,27 @@ async function pushToUser(index) {
         
         // Add IPFS hash to root level if available
         if (doc.ipfsHash) {
+            // Update at the root level - this is essential for the user dashboard display
             updateData.ipfsHash = doc.ipfsHash;
+            updateData.ipfsUrl = `https://ipfs.io/ipfs/${doc.ipfsHash}`;
             
             // Get existing fileDetails or create new object
-            const fileDetails = existingDoc.fileDetails || {};
+            let fileDetails = existingDoc && existingDoc.fileDetails ? 
+                {...existingDoc.fileDetails} : // Create a copy of the existing fileDetails
+                {}; // Create new empty object if no fileDetails exists
             
-            // Update fileDetails with IPFS hash
+            // Update fileDetails with IPFS hash - both of these properties must exist
             fileDetails.ipfsHash = doc.ipfsHash;
             fileDetails.ipfsUrl = `https://ipfs.io/ipfs/${doc.ipfsHash}`;
             
             // Add updated fileDetails to the update
             updateData.fileDetails = fileDetails;
+            
+            console.log('Pushing IPFS hash update to user:', {
+                docId: doc.id,
+                ipfsHash: doc.ipfsHash,
+                updateData: JSON.stringify(updateData)
+            });
         }
         
         // Update the document
@@ -1933,8 +2327,24 @@ async function pushToUser(index) {
         
         showToast(`Document status "${doc.status}" pushed to user successfully!`, 'success');
         
-        // Refresh the documents to show updated status
-        loadDocuments();
+        // Update the UI by finding the card using data attribute
+        const documentCard = Array.from(document.querySelectorAll('.document-card'))
+            .find(card => parseInt(card.dataset.documentIndex) === index);
+        
+        if (documentCard) {
+            // Update the card to show pushed status
+            const statusSpan = documentCard.querySelector('.document-status');
+            if (statusSpan) {
+                statusSpan.textContent = `${doc.status} (Pushed)`;
+            }
+            
+            // Add a brief highlight effect
+            documentCard.style.transition = 'background-color 0.5s ease';
+            documentCard.style.backgroundColor = '#d1fae5';
+            setTimeout(() => {
+                documentCard.style.backgroundColor = '';
+            }, 1500);
+        }
         
     } catch (error) {
         console.error('Error pushing to user:', error);
@@ -1962,5 +2372,223 @@ function makeButtonsClickable() {
             filename.style.cursor = 'pointer';
             filename.style.pointerEvents = 'auto';
         }
+    });
+}
+
+// Function to add pagination controls
+function addDocumentPagination(totalDocuments) {
+    const documentsSection = document.getElementById('documents');
+    let paginationContainer = documentsSection.querySelector('.documents-pagination');
+    
+    // Create pagination container if it doesn't exist
+    if (!paginationContainer) {
+        paginationContainer = document.createElement('div');
+        paginationContainer.className = 'documents-pagination';
+        documentsSection.appendChild(paginationContainer);
+    }
+    
+    // Clear existing pagination
+    paginationContainer.innerHTML = '';
+    
+    // Only show pagination if we have more than one page
+    if (totalDocumentPages <= 1) {
+        return;
+    }
+    
+    // Create pagination info
+    const paginationInfo = document.createElement('div');
+    paginationInfo.className = 'pagination-info';
+    paginationInfo.textContent = `Page ${currentPage} of ${totalDocumentPages} (${totalDocuments} documents)`;
+    paginationContainer.appendChild(paginationInfo);
+    
+    // Create pagination buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'pagination-buttons';
+    
+    // Previous button
+    const prevButton = document.createElement('button');
+    prevButton.className = 'pagination-btn prev';
+    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Previous';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            displayDocuments(window.adminDocuments);
+        }
+    });
+    buttonContainer.appendChild(prevButton);
+    
+    // Page number buttons
+    const maxButtons = 5; // Maximum number of page buttons to show
+    const startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    const endPage = Math.min(totalDocumentPages, startPage + maxButtons - 1);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.className = `pagination-btn page ${i === currentPage ? 'active' : ''}`;
+        pageButton.textContent = i;
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            displayDocuments(window.adminDocuments);
+        });
+        buttonContainer.appendChild(pageButton);
+    }
+    
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.className = 'pagination-btn next';
+    nextButton.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+    nextButton.disabled = currentPage === totalDocumentPages;
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalDocumentPages) {
+            currentPage++;
+            displayDocuments(window.adminDocuments);
+        }
+    });
+    buttonContainer.appendChild(nextButton);
+    
+    paginationContainer.appendChild(buttonContainer);
+    
+    // Add some CSS for pagination
+    if (!document.getElementById('pagination-styles')) {
+        const style = document.createElement('style');
+        style.id = 'pagination-styles';
+        style.textContent = `
+            .documents-pagination {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-top: 20px;
+                gap: 10px;
+            }
+            
+            .pagination-info {
+                color: white;
+                font-size: 14px;
+            }
+            
+            .pagination-buttons {
+                display: flex;
+                gap: 5px;
+            }
+            
+            .pagination-btn {
+                background-color: #333;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+            
+            .pagination-btn:hover:not(:disabled) {
+                background-color: #444;
+            }
+            
+            .pagination-btn.active {
+                background-color: #3b82f6;
+            }
+            
+            .pagination-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function viewDocument(index) {
+    // First try to get document from memory
+    const documents = window.adminDocuments || [];
+    let doc = documents[index];
+    
+    // If not in memory or missing content, check if we need to fetch from Firebase
+    if (!doc || (doc.fileDetails && !doc.fileDetails.fileContent && (doc.fileDetails.hasContent || doc.hasDetails))) {
+        // Need to fetch from Firebase
+        const firebaseDb = firebase.database();
+        const docId = doc?.id;
+        
+        if (firebaseDb && docId) {
+            showToast('Loading document content...', 'info');
+            
+            firebaseDb.ref(`userDocuments/${docId}`).once('value')
+                .then((snapshot) => {
+                    const fullDoc = snapshot.val();
+                    if (fullDoc && fullDoc.fileDetails && fullDoc.fileDetails.fileContent) {
+                        // Open file content in new tab
+                        openDocumentInNewTab(fullDoc.fileDetails.fileContent);
+                    } else {
+                        showToast('File content not available in database', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching document content:', error);
+                    showToast('Error loading file content: ' + error.message, 'error');
+                });
+        } else {
+            showToast('Cannot load document - missing ID', 'error');
+        }
+        return;
+    }
+    
+    // Check if we have file content to display
+    if (doc.fileDetails && doc.fileDetails.fileContent) {
+        openDocumentInNewTab(doc.fileDetails.fileContent);
+    } else if (doc.fileDetails && doc.fileDetails.storageIssue) {
+        // Show storage issue message
+        showToast('Cannot display file: ' + doc.fileDetails.storageIssue, 'error');
+    } else {
+        // No file content available
+        showToast('File content not available. File may be too large or not properly stored.', 'error');
+    }
+}
+
+// Helper function to open document in new tab
+function openDocumentInNewTab(fileContent) {
+    const win = window.open();
+    win.document.write(`
+        <iframe src="${fileContent}" frameborder="0" 
+        style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" 
+        allowfullscreen></iframe>
+    `);
+}
+
+// Add this function to optimize images before upload
+async function optimizeImage(base64Data) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            // Max dimension
+            const MAX_DIMENSION = 1200;
+            
+            // Scale down if image is too large
+            if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                if (width > height) {
+                    height = Math.round((height * MAX_DIMENSION) / width);
+                    width = MAX_DIMENSION;
+                } else {
+                    width = Math.round((width * MAX_DIMENSION) / height);
+                    height = MAX_DIMENSION;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convert to blob with quality 0.8 for JPG
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, 'image/jpeg', 0.8);
+        };
+        img.src = base64Data;
     });
 }
