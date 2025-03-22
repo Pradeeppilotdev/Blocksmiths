@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isAdmin) {
                     window.location.href = '../admin/superuser.html';
                 } else {
-                    window.location.href = '../home.html';
+                    window.location.href = '../login/login.html';
                 }
             }, 2000);
         })
