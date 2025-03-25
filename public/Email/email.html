@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Authentication</title>
-    <!-- Load EmailJS -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    
-    <!-- Add Firebase products that you want to use -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <link rel="stylesheet" href="email.css">
     <style>
@@ -89,55 +80,22 @@
         <div id="debug"></div>
     </div>
     <script>
-        // Check if EmailJS is loaded
-        window.onload = function() {
-            if (typeof emailjs === 'undefined') {
-                alert('Warning: EmailJS failed to load. Please check your internet connection.');
+        // Debug info - press Shift+D to show
+        document.addEventListener('keydown', function(e) {
+            if (e.shiftKey && e.key === 'D') {
+                const debugElement = document.getElementById('debug');
+                debugElement.style.display = debugElement.style.display === 'none' ? 'block' : 'none';
+                
+                // Show localStorage
+                let debugInfo = 'LocalStorage:\n';
+                debugInfo += `userLoggedIn: ${localStorage.getItem('userLoggedIn')}\n`;
+                debugInfo += `userEmail: ${localStorage.getItem('userEmail')}\n`;
+                debugInfo += `isEmailVerified: ${localStorage.getItem('isEmailVerified')}\n`;
+                debugInfo += `authToken: ${localStorage.getItem('authToken')}\n`;
+                
+                debugElement.textContent = debugInfo;
             }
-            
-            // Initialize Firebase
-            try {
-                const firebaseConfig = {
-                    apiKey: "AIzaSyC1xpIBYJ9z8Xgwrt1RkZQffyPhtnAhY3c",
-                    authDomain: "blocksmiths-a8021.firebaseapp.com",
-                    databaseURL: "https://blocksmiths-a8021-default-rtdb.asia-southeast1.firebasedatabase.app",
-                    projectId: "blocksmiths-a8021",
-                    storageBucket: "blocksmiths-a8021.appspot.com",
-                    messagingSenderId: "243684466522",
-                    appId: "1:243684466522:web:8f1231b1e3831de1c99d63",
-                    measurementId: "G-FVBSQRWGB1"
-                };
-                
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                    console.log("Firebase initialized for OTP auth");
-                }
-                
-                // Debug info - press Shift+D to show
-                document.addEventListener('keydown', function(e) {
-                    if (e.shiftKey && e.key === 'D') {
-                        const debugElement = document.getElementById('debug');
-                        debugElement.style.display = debugElement.style.display === 'none' ? 'block' : 'none';
-                        
-                        // Show auth state
-                        const user = firebase.auth().currentUser;
-                        let debugInfo = 'Current Auth State:\n';
-                        debugInfo += user ? `User: ${user.email} (${user.uid})\n` : 'No user signed in\n';
-                        
-                        // Show localStorage
-                        debugInfo += '\nLocalStorage:\n';
-                        debugInfo += `userLoggedIn: ${localStorage.getItem('userLoggedIn')}\n`;
-                        debugInfo += `userEmail: ${localStorage.getItem('userEmail')}\n`;
-                        debugInfo += `isEmailVerified: ${localStorage.getItem('isEmailVerified')}\n`;
-                        
-                        debugElement.textContent = debugInfo;
-                    }
-                });
-                
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-            }
-        }
+        });
     </script>
     <script src="email.js"></script>
 </body>
