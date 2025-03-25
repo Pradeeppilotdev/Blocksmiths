@@ -1,6 +1,6 @@
 const SEPOLIA_CHAIN_ID = '0xaa36a7'; // Chain ID for Sepolia
 const SEPOLIA_RPC_URL = 'https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID'; // Replace with your Infura project ID
-
+//want to add api keys private
 function showLoadingState(service) {
     const button = document.querySelector(`#payButton-${service}`);
     const text = button.querySelector('.payment-text');
