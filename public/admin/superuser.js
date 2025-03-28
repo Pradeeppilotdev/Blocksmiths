@@ -1197,8 +1197,8 @@ async function uploadToIPFS(index) {
         const result = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'pinata_api_key': 'f06e5fd1f9bd46842319',
-                'pinata_secret_api_key': '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
+                'pinata_api_key': window.appConfig?.pinata?.apiKey || 'f06e5fd1f9bd46842319',
+                'pinata_secret_api_key': window.appConfig?.pinata?.secretKey || '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd'
             },
             timeout: 30000, // 30 second timeout
             onUploadProgress: (progressEvent) => {

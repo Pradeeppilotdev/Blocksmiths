@@ -225,25 +225,38 @@ const contractABI = [
 const SEPOLIA_CHAIN_ID = '0xaa36a7';
 const SEPOLIA_CHAIN_ID_DECIMAL = '11155111';
 
-// Add Firebase configuration for Blocksmiths project
-const firebaseConfig = {
-  apiKey: "AIzaSyC1xpIBYJ9z8Xgwrt1RkZQffyPhtnAhY3c",
-  authDomain: "blocksmiths-a8021.firebaseapp.com",
-  databaseURL: "https://blocksmiths-a8021-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "blocksmiths-a8021",
-  storageBucket: "blocksmiths-a8021.firebasestorage.app",
-  messagingSenderId: "243684466522",
-  appId: "1:243684466522:web:8f1231b1e3831de1c99d63",
-  measurementId: "G-FVBSQRWGB1"
-};
+// Firebase configuration will be loaded from window.appConfig
+let firebaseConfig = {};
 
 // Initialize Firebase
 let firebaseApp;
 let firebaseStorage;
 let firebaseDb;
 
-// Initialize Firebase when DOM is loaded
+// Initialize Firebase when DOM is loaded and config is available
 document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener for when config is loaded
+    document.addEventListener('configLoaded', function() {
+        if (window.appConfig && window.appConfig.firebase) {
+            console.log("Config loaded successfully, initializing Firebase");
+            firebaseConfig = window.appConfig.firebase;
+            initFirebaseWithConfig();
+        } else {
+            console.error("Firebase configuration not found in window.appConfig");
+            showError("Failed to load Firebase configuration");
+        }
+    });
+    
+    // Check if config is already loaded
+    if (window.appConfig && window.appConfig.firebase) {
+        console.log("Config already loaded, initializing Firebase");
+        firebaseConfig = window.appConfig.firebase;
+        initFirebaseWithConfig();
+    }
+});
+
+// Function to initialize Firebase with the loaded config
+function initFirebaseWithConfig() {
     try {
         // Initialize Firebase
         firebaseApp = firebase.initializeApp(firebaseConfig);
@@ -257,13 +270,20 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Firebase initialization error:", error);
         showError("Failed to initialize Firebase: " + error.message);
     }
-});
+}
 
 // Function to initialize Firebase if not already initialized
 function initFirebase() {
     if (!firebaseApp) {
+        if (!window.appConfig || !window.appConfig.firebase) {
+            console.error("Firebase configuration not loaded yet");
+            showError("Firebase configuration not loaded yet. Please try again in a moment.");
+            return false;
+        }
+        
         try {
             console.log("Initializing Firebase...");
+            firebaseConfig = window.appConfig.firebase;
             firebaseApp = firebase.initializeApp(firebaseConfig);
             firebaseStorage = firebase.storage();
             firebaseDb = firebase.database();
@@ -914,36 +934,25 @@ function formatFileSize(bytes) {
     else return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
-// Helper function to convert file to base64
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
-
-// Function to upload file to IPFS via Pinata
+// Function to upload file to IPFS
 async function uploadToIPFS(file) {
+    console.log('Uploading to IPFS:', file.name);
+    
     try {
-        console.log('Uploading to IPFS via Pinata...');
-        
-        // Update UI text in relevant places that might refer to IPFS
-        const uploadingElements = document.querySelectorAll('[id^="payButton-"]');
-        uploadingElements.forEach(element => {
-            if (element.innerHTML.includes('Uploading to IPFS')) {
-                element.innerHTML = '<span class="animate-spin">↻</span> Processing...';
-            }
-        });
-        
         // Create FormData
         const formData = new FormData();
         formData.append('file', file);
         
-        // Pinata credentials - same as in admin panel (superuser.js)
-        const pinataApiKey = 'f06e5fd1f9bd46842319';
-        const pinataSecretApiKey = '8860a2b0c4cc09b36797ebf7f1b05026705ce60c97d65687eba30ef2651517cd';
+        // Get Pinata credentials from config
+        let pinataApiKey, pinataSecretApiKey;
+        
+        if (window.appConfig && window.appConfig.pinata) {
+            pinataApiKey = window.appConfig.pinata.apiKey;
+            pinataSecretApiKey = window.appConfig.pinata.secretKey;
+        } else {
+            console.warn("Pinata configuration not found in window.appConfig, falling back to environment variables");
+            // We'll get these from the server if needed
+        }
         
         // Upload to IPFS via Pinata with timeout and progress tracking
         const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', formData, {
@@ -1325,11 +1334,30 @@ function handleLogout() {
     const originalContent = logoutButton.innerHTML;
     logoutButton.innerHTML = '<span class="animate-spin">↻</span> Logging out...';
     
-    // Simulate a brief delay for better UX
-    setTimeout(() => {
-        // Redirect to index.html
-        window.location.href = 'index.html';
-    }, 1000);
+    // Sign out from Firebase if initialized
+    if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
+        firebase.auth().signOut().then(() => {
+            console.log("User signed out from Firebase");
+            
+            // Clear localStorage
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userUid');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userRole');
+            
+            // Redirect to login page with logout parameter
+            window.location.href = './login/login.html?logout=true';
+        }).catch(error => {
+            console.error("Error signing out:", error);
+            // Still redirect to login page
+            window.location.href = './login/login.html?logout=true';
+        });
+    } else {
+        // If Firebase isn't available, just redirect
+        console.log("Firebase not initialized, redirecting directly");
+        window.location.href = './login/login.html?logout=true';
+    }
 }
 
 // Fix for the updateDocumentsTable error - more specific fix

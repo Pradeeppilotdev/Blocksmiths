@@ -27,23 +27,61 @@
     <script>
         // Check if user is authenticated, redirect to login if not
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                // Check Firebase auth
-                if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
-                    firebase.auth().onAuthStateChanged(function(user) {
-                        if (!user) {
-                            console.log('No authenticated user found. Redirecting to login page...');
-                            localStorage.removeItem('user');
-                            window.location.href = './login/login.html';
-                        } else {
-                            console.log('User authenticated:', user.email);
-                        }
-                    });
+            // Add event listener for when config is loaded
+            document.addEventListener('configLoaded', function() {
+                if (window.appConfig && window.appConfig.firebase) {
+                    console.log("Config loaded, initializing Firebase");
+                    
+                    // Check if Firebase is already initialized
+                    if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+                        firebase.initializeApp(window.appConfig.firebase);
+                    }
+                    
+                    setTimeout(function() {
+                        // Check Firebase auth
+                        firebase.auth().onAuthStateChanged(function(user) {
+                            if (!user) {
+                                console.log('No authenticated user found. Redirecting to login page...');
+                                localStorage.removeItem('user');
+                                window.location.href = './login/login.html';
+                            } else {
+                                console.log('User authenticated:', user.email);
+                            }
+                        });
+                    }, 500); // Small delay to ensure auth is ready
                 } else {
-                    console.error('Firebase not initialized');
+                    console.error('Firebase configuration not found in window.appConfig');
                     window.location.href = './login/login.html';
                 }
-            }, 1000); // Give Firebase time to initialize
+            });
+            
+            // Check if config is already loaded
+            if (window.appConfig && window.appConfig.firebase) {
+                console.log("Config already loaded, performing auth check");
+                
+                // Check if Firebase is already initialized
+                if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+                    firebase.initializeApp(window.appConfig.firebase);
+                }
+                
+                setTimeout(function() {
+                    // Check Firebase auth
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                        firebase.auth().onAuthStateChanged(function(user) {
+                            if (!user) {
+                                console.log('No authenticated user found. Redirecting to login page...');
+                                localStorage.removeItem('user');
+                                window.location.href = './login/login.html';
+                            } else {
+                                console.log('User authenticated:', user.email);
+                            }
+                        });
+                    } else {
+                        console.error('Firebase not initialized');
+                        window.location.href = './login/login.html';
+                    }
+                }, 500); // Small delay to ensure auth is ready
+            }
         });
     </script>
 </head>
@@ -708,8 +746,8 @@
                         "=;expires=" + new Date().toUTCString() + ";path=/"); 
                 });
                 
-                // Redirect to login page
-                window.location.href = './login/login.html';
+                // Redirect to login page with logout parameter
+                window.location.href = './login/login.html?logout=true';
             }).catch((error) => {
                 console.error('Error signing out:', error);
                 
@@ -719,7 +757,7 @@
                 
                 // Still attempt to redirect after a delay
                 setTimeout(() => {
-                    window.location.href = './login/login.html';
+                    window.location.href = './login/login.html?logout=true';
                 }, 2000);
             });
         }
