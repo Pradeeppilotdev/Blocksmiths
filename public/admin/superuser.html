@@ -17,26 +17,16 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     
-    <!-- Initialize Firebase -->
-     <!--Want to make the api key secure-->
+    <!-- Load configuration from server -->
+    <script src="/config.js"></script>
+    
+        
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC1xpIBYJ9z8Xgwrt1RkZQffyPhtnAhY3c",
-            authDomain: "blocksmiths-a8021.firebaseapp.com",
-            databaseURL: "https://blocksmiths-a8021-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "blocksmiths-a8021",
-            storageBucket: "blocksmiths-a8021.firebasestorage.app",
-            messagingSenderId: "243684466522",
-            appId: "1:243684466522:web:8f1231b1e3831de1c99d63",
-            measurementId: "G-FVBSQRWGB1"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        
-        // Log successful initialization
-        console.log("Firebase initialized for admin dashboard");
+        document.addEventListener('configLoaded', function() {
+            firebase.initializeApp(window.appConfig.firebase);
+            
+            console.log("Firebase initialized for admin dashboard");
+        });
     </script>
 </head>
 <body>

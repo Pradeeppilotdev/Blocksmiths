@@ -11,7 +11,13 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('public', {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
 
 // Initialize Firebase Admin SDK
 try {
@@ -128,6 +134,28 @@ app.post('/api/verify-otp', async (req, res) => {
   }
 });
 
+// API endpoint to serve configuration to client
+app.get('/api/config', (req, res) => {
+  // Only send necessary configuration to the client
+  const clientConfig = {
+    firebase: {
+      apiKey: process.env.FIREBASE_API_KEY,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      databaseURL: process.env.FIREBASE_DATABASE_URL,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.FIREBASE_APP_ID,
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID
+    },
+    infura: {
+      sepoliaRpcUrl: process.env.INFURA_SEPOLIA_RPC_URL
+    }
+  };
+  
+  res.json(clientConfig);
+});
+
 // Serve the home.html file as the default page
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'home.html'));
@@ -136,4 +164,4 @@ app.get('/', (req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-}); 
+});

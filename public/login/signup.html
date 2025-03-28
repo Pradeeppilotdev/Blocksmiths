@@ -161,46 +161,24 @@
         }
     </style>
     
-    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    
-    <!-- Add Firebase products that you want to use -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- Load configuration from server -->
+    <script src="/config.js"></script>
     
     <!-- Initialize Firebase -->
     <script>
-        // Firebase configuration - MAKE SURE THIS IS CORRECT
-        const firebaseConfig = {
-            apiKey: "AIzaSyC1xpIBYJ9z8Xgwrt1RkZQffyPhtnAhY3c",
-            authDomain: "blocksmiths-a8021.firebaseapp.com",
-            databaseURL: "https://blocksmiths-a8021-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "blocksmiths-a8021",
-            storageBucket: "blocksmiths-a8021.appspot.com",
-            messagingSenderId: "243684466522",
-            appId: "1:243684466522:web:8f1231b1e3831de1c99d63",
-            measurementId: "G-FVBSQRWGB1"
-        };
-        
-        // Initialize Firebase
-        try {
+        document.addEventListener('configLoaded', function() {
             if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
+                firebase.initializeApp(window.appConfig.firebase);
                 console.log("Firebase initialized successfully");
             }
-        } catch (error) {
-            console.error("Firebase initialization error:", error);
-        }
+        });
         
-        // Clean up any error messages
         window.addEventListener('DOMContentLoaded', function() {
-            // Add the test class to body after a delay to check if styles are applied
             setTimeout(function() {
                 document.body.classList.add('test-active');
                 console.log("Added test-active class to body");
             }, 500);
             
-            // Debug to check CSS loading
             console.log("Document loaded. Checking CSS:");
             const styles = document.styleSheets;
             for (let i = 0; i < styles.length; i++) {
