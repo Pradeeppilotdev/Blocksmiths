@@ -32,13 +32,18 @@
                 console.log("Firebase initialized successfully");
             }
             
-            firebase.auth().signOut().then(() => {
-                console.log("Signed out existing user");
-                localStorage.removeItem('userLoggedIn');
-                localStorage.removeItem('userUid');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('userEmail');
-            });
+            // Only sign out if we're explicitly on the login page
+            // Don't automatically sign out users who might be trying to log in
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('logout') && urlParams.get('logout') === 'true') {
+                firebase.auth().signOut().then(() => {
+                    console.log("Signed out user per logout parameter");
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('userUid');
+                    localStorage.removeItem('userName');
+                    localStorage.removeItem('userEmail');
+                });
+            }
         });
     </script>
     

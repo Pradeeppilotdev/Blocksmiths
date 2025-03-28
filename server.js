@@ -150,6 +150,10 @@ app.get('/api/config', (req, res) => {
     },
     infura: {
       sepoliaRpcUrl: process.env.INFURA_SEPOLIA_RPC_URL
+    },
+    pinata: {
+      apiKey: process.env.PINATA_API_KEY,
+      secretKey: process.env.PINATA_SECRET_KEY
     }
   };
   
